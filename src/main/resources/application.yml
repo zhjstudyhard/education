@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    username: root
+    password: zhj123459
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/education?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&allowMultiQueries=true
+#  redis:
+#    host: 192.168.160.135
+#    port: 6379
+#    database: 0
+#    password:
+  application:
+    name: education
+  jackson:
+    date-format: yyyy-MM-dd hh:mm:ss
+    time-zone: GMT+8
+  devtools:
+    restart:
+      enabled: true
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapper/**/*.xml
+server:
+  port: 8089

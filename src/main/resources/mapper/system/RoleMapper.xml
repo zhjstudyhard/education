@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.system.RoleMapper">
+    <select id="queryRoleAllPage" resultType="com.education.entity.system.RoleEntity">
+        select *
+        from b_role
+        where is_deleted = 0
+        <if test="roleCode != null and roleCode != ''">
+            and role_code = #{roleCode}
+        </if>
+        <if test="roleName != null and roleName != ''">
+            and role_name like concat('%',#{roleName},'%')
+        </if>
+        order by gmt_create DESC
+    </select>
+
+    <select id="queryRoleAll" resultType="com.education.entity.system.RoleEntity">
+        select *
+        from b_role
+        where is_deleted = 0
+        <if test="roleName != null and roleName != ''">
+            and role_name like concat('%',#{roleName},'%')
+        </if>
+        order by gmt_create DESC
+    </select>
+</mapper>

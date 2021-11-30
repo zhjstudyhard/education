@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.system.DictionaryMapper">
+
+    <select id="queryDictionaryAllPage" resultType="com.education.entity.system.DictionaryEntity">
+        select *
+        from b_dictionary
+        where is_deleted = 0
+        <if test="dictionaryCode != null and dictionaryCode != ''">
+            and dictionary_code = #{dictionaryCode}
+        </if>
+        <if test="dictionaryValue != null and dictionaryValue != ''">
+            and dictionary_value like concat('%',#{dictionaryValue},'%')
+        </if>
+        <if test="dictionaryType != null and dictionaryType != ''">
+            and dictionary_type = #{dictionaryType}
+        </if>
+        order by gmt_create DESC
+    </select>
+</mapper>

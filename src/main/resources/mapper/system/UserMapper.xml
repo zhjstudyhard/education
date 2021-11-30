@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.system.UserMapper">
+    <select id="queryUserAllPage" resultType="com.education.vo.UserVo">
+        select
+        bu.*,
+        br.id as roleId,
+        br.role_name as roleName
+        from b_user bu
+        left join b_userrole bur on bur.user_id = bu.id and bur.is_deleted = 0
+        left join b_role br on br.id = bur.role_id and br.is_deleted = 0
+        where bu.is_deleted = 0
+        <if test="username != null and username != ''">
+            and username like concat('%',#{username},'%')
+        </if>
+        <if test="realName != null and realName != ''">
+            and real_name like concat('%',#{realName},'%')
+        </if>
+        order by gmt_create DESC
+    </select>
+</mapper>
