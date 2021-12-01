@@ -30,8 +30,8 @@ public interface PermissionService{
 //    //获取全部菜单
 //    List<PermissionEntity> queryAllMenu();
 
-//    //根据角色获取菜单
-//    List<Permission> selectAllMenu(String roleId);
+    //根据角色获取菜单
+    List<PermissionVo> selectAllMenu(String roleId);
 //
 //    //给角色分配权限
 //    void saveRolePermissionRealtionShip(String roleId, String[] permissionId);
@@ -48,7 +48,7 @@ public interface PermissionService{
 //
     //递归删除菜单
     void removeChildById(PermissionEntity permissionEntity);
-//
-//    //给角色分配权限
-//    void saveRolePermissionRealtionShipGuli(String roleId, String[] permissionId);
+
+    //给角色分配权限
+    void saveRolePermissionRealtionShipGuli(String roleId, String[] permissionId);
 }

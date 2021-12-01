@@ -32,43 +32,59 @@ public class PermissionController {
     private PermissionService permissionService;
 
     /**
-     * @description 查询所有菜单
      * @return com.education.common.Result
+     * @description 查询所有菜单
      * @author 橘白
      * @date 2021/11/28 12:52
      */
 
     @PostMapping("/queryAllMenu")
     public Result indexAllPermission(@RequestBody PermissionEntity permissionEntity) {
-        List<PermissionVo> list =  permissionService.queryAllMenu(permissionEntity);
-        return Result.success().data("children",list);
+        List<PermissionVo> list = permissionService.queryAllMenu(permissionEntity);
+        return Result.success().data("children", list);
     }
+
+    /*
+     * @description 删除权限
+     * @param null
+     * @author 橘白
+     * @date 2021/12/1 21:41
+     */
 
     @PostMapping("/removePermission")
     public Result remove(@RequestBody PermissionEntity permissionEntity) {
         permissionService.removeChildById(permissionEntity);
         return Result.success();
     }
-//
-//    @ApiOperation(value = "给角色分配权限")
-//    @PostMapping("/doAssign")
-//    public R doAssign(String roleId,String[] permissionId) {
-//        permissionService.saveRolePermissionRealtionShipGuli(roleId,permissionId);
-//        return R.ok();
-//    }
-//
-//    @ApiOperation(value = "根据角色获取菜单")
-//    @GetMapping("toAssign/{roleId}")
-//    public R toAssign(@PathVariable String roleId) {
-//        List<Permission> list = permissionService.selectAllMenu(roleId);
-//        return R.ok().data("children", list);
-//    }
-//
-//
+
     /**
-     * @description  新增菜单
+     * @param roleId
+     * @param permissionId
+     * @return com.education.common.Result
+     * @description 角色分配权限
+     * @author 橘白
+     * @date 2021/12/1 21:42
+     */
+
+    @PostMapping("/doAssign")
+    public Result doAssign(String roleId, String[] permissionId) {
+        permissionService.saveRolePermissionRealtionShipGuli(roleId, permissionId);
+        return Result.success();
+    }
+
+
+    @GetMapping("toAssign/{roleId}")
+    public Result toAssign(@PathVariable String roleId) {
+        List<PermissionVo> list = permissionService.selectAllMenu(roleId);
+        return Result.success().data("children", list);
+    }
+//
+//
+
+    /**
      * @param permissionEntity
      * @return com.education.common.Result
+     * @description 新增菜单
      * @author 橘白
      * @date 2021/11/28 18:18
      */
@@ -79,9 +95,9 @@ public class PermissionController {
     }
 
     /**
-     * @description  修改菜单
      * @param permissionEntity
      * @return com.education.common.Result
+     * @description 修改菜单
      * @author 橘白
      * @date 2021/11/28 19:50
      */
@@ -92,9 +108,9 @@ public class PermissionController {
     }
 
     /**
-     * @description  新增按钮权限
      * @param permissionEntity
      * @return com.education.common.Result
+     * @description 新增按钮权限
      * @author 橘白
      * @date 2021/11/28 18:18
      */
@@ -105,9 +121,9 @@ public class PermissionController {
     }
 
     /**
-     * @description  修改按钮权限
      * @param permissionEntity
      * @return com.education.common.Result
+     * @description 修改按钮权限
      * @author 橘白
      * @date 2021/11/28 19:50
      */

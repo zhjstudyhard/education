@@ -15,4 +15,6 @@ import java.util.List;
 @Mapper
 public interface PermissionMapper extends BaseMapper<PermissionEntity> {
     List<PermissionVo> queryAllMenu(PermissionEntity permissionEntity);
+
+    List<PermissionVo> selectAllPermission();
 }

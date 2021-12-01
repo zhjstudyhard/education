@@ -1,18 +1,8 @@
 package com.education.entity.system;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-
-import java.util.Date;
-
-import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.io.Serializable;
-
 import com.education.entity.base.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+
 
 /**
  * <p>
@@ -22,7 +12,8 @@ import lombok.experimental.Accessors;
  * @author testjava
  * @since 2020-01-12
  */
-public class RolePermission extends BaseEntity {
+@TableName(value = "b_rolepermission")
+public class RolePermissionEntity extends BaseEntity {
 
     private String roleId;
 

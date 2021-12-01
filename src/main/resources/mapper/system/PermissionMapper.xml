@@ -7,8 +7,12 @@
     <select id="queryAllMenu" resultType="com.education.vo.PermissionVo">
         select * from b_permission where is_deleted = 0
         <if test="name != null and name != ''">
-            name like concat('%',#{name},'%')
+            and name like concat('%',#{name},'%')
         </if>
         order by id
+    </select>
+    <select id="selectAllPermission" resultType="com.education.vo.PermissionVo">
+        select * from b_permission where is_deleted = 0
+        order by CAST(id AS SIGNED)
     </select>
 </mapper>
