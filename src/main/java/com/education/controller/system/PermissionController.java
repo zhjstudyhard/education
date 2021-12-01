@@ -39,16 +39,16 @@ public class PermissionController {
      */
 
     @PostMapping("/queryAllMenu")
-    public Result indexAllPermission() {
-        List<PermissionVo> list =  permissionService.queryAllMenu();
+    public Result indexAllPermission(@RequestBody PermissionEntity permissionEntity) {
+        List<PermissionVo> list =  permissionService.queryAllMenu(permissionEntity);
         return Result.success().data("children",list);
     }
 
-//    @DeleteMapping("remove/{id}")
-//    public R remove(@PathVariable String id) {
-//        permissionService.removeChildByIdGuli(id);
-//        return R.ok();
-//    }
+    @PostMapping("/removePermission")
+    public Result remove(@RequestBody PermissionEntity permissionEntity) {
+        permissionService.removeChildById(permissionEntity);
+        return Result.success();
+    }
 //
 //    @ApiOperation(value = "给角色分配权限")
 //    @PostMapping("/doAssign")

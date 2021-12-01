@@ -17,7 +17,7 @@ import java.util.List;
 public interface PermissionService{
 
     //获取全部菜单
-    List<PermissionVo> queryAllMenu();
+    List<PermissionVo> queryAllMenu(PermissionEntity permissionEntity);
 
     void save(PermissionEntity permissionEntity);
 
@@ -46,8 +46,8 @@ public interface PermissionService{
 //
 
 //
-//    //递归删除菜单
-//    void removeChildByIdGuli(String id);
+    //递归删除菜单
+    void removeChildById(PermissionEntity permissionEntity);
 //
 //    //给角色分配权限
 //    void saveRolePermissionRealtionShipGuli(String roleId, String[] permissionId);
