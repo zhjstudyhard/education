@@ -3,6 +3,7 @@ package com.education.service.serviceImpl.system;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.ResultCode;
 import com.education.constant.Constant;
+import com.education.dto.system.RolePermissionDto;
 import com.education.entity.system.PermissionEntity;
 import com.education.entity.system.RolePermissionEntity;
 import com.education.exceptionhandler.EducationException;
@@ -14,8 +15,10 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
  * @since 2020-01-12
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class PermissionServiceImpl implements PermissionService {
     @Autowired
     private PermissionMapper permissionMapper;
@@ -51,16 +55,16 @@ public class PermissionServiceImpl implements PermissionService {
                 .eq("name", permissionEntity.getName());
         PermissionEntity permissionEntityLocalRepart = permissionMapper.selectOne(permissionEntityQueryWrapper);
         if (permissionEntityLocalRepart != null) {
-                throw new EducationException(ResultCode.FAILER_CODE.getCode(), "菜单名称重复");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "菜单名称重复");
         }
         //校验数据重复
         QueryWrapper<PermissionEntity> permissionPathEntityQueryWrapper = new QueryWrapper<>();
         permissionPathEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
                 .eq("type", permissionEntity.getType())
-                .eq("path",permissionEntity.getPath());
+                .eq("path", permissionEntity.getPath());
         PermissionEntity permissionPathEntityLocalRepart = permissionMapper.selectOne(permissionEntityQueryWrapper);
         if (permissionEntityLocalRepart != null) {
-                throw new EducationException(ResultCode.FAILER_CODE.getCode(),"访问路径重复");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "访问路径重复");
         }
         permissionMapper.insert(permissionEntity);
     }
@@ -85,12 +89,12 @@ public class PermissionServiceImpl implements PermissionService {
         QueryWrapper<PermissionEntity> permissionPathEntityQueryWrapper = new QueryWrapper<>();
         permissionPathEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
                 .eq("type", permissionEntity.getType())
-                .eq("path",permissionEntity.getPath());
+                .eq("path", permissionEntity.getPath());
         PermissionEntity permissionPathEntityLocalRepart = permissionMapper.selectOne(permissionEntityQueryWrapper);
         if (permissionEntityLocalRepart != null) {
-                if (!permissionEntity.getId().equals(permissionPathEntityLocalRepart.getId())){
-                    throw new EducationException(ResultCode.FAILER_CODE.getCode(),"访问路径重复");
-                }
+            if (!permissionEntity.getId().equals(permissionPathEntityLocalRepart.getId())) {
+                throw new EducationException(ResultCode.FAILER_CODE.getCode(), "访问路径重复");
+            }
         }
         PermissionEntity permissionEntityLocal = permissionMapper.selectById(permissionEntity.getId());
         BeanUtils.copyProperties(permissionEntity, permissionEntityLocal);
@@ -156,17 +160,20 @@ public class PermissionServiceImpl implements PermissionService {
 //        return result;
 //    }
 
-        //根据角色获取菜单
+    //根据角色获取菜单
     @Override
     public List<PermissionVo> selectAllMenu(String roleId) {
+        if (StringUtils.isBlank(roleId)) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "角色id为空");
+        }
         List<PermissionVo> allPermissionList = permissionMapper.selectAllPermission();
 //        List<PermissionEntity> allPermissionList = permissionMapper.selectList(new QueryWrapper<PermissionEntity>().eq("is_deleted",Constant.ISDELETED_FALSE).orderByAsc("CAST(id AS SIGNED)"));
         //根据角色id获取角色权限
-        List<RolePermissionEntity> rolePermissionEntityList = rolePermissionMapper.selectList(new QueryWrapper<RolePermissionEntity>().eq("role_id",roleId).eq("is_deleted",Constant.ISDELETED_FALSE));
+        List<RolePermissionEntity> rolePermissionEntityList = rolePermissionMapper.selectList(new QueryWrapper<RolePermissionEntity>().eq("role_id", roleId).eq("is_deleted", Constant.ISDELETED_FALSE));
         //转换给角色id与角色权限对应Map对象
         List<String> permissionIdList = rolePermissionEntityList.stream().map(e -> e.getPermissionId()).collect(Collectors.toList());
         allPermissionList.forEach(permissionVo -> {
-            if(permissionIdList.contains(permissionVo.getId())) {
+            if (permissionIdList.contains(permissionVo.getId())) {
                 permissionVo.setSelect(true);
             } else {
                 permissionVo.setSelect(false);
@@ -272,8 +279,10 @@ public class PermissionServiceImpl implements PermissionService {
 //        });
 //    }
 //
+
     /**
      * 使用递归方法建菜单
+     *
      * @param treeNodes
      * @return
      */
@@ -282,7 +291,7 @@ public class PermissionServiceImpl implements PermissionService {
         for (PermissionVo treeNode : treeNodes) {
             if ("0".equals(treeNode.getPid())) {
                 treeNode.setLevel(1);
-                trees.add(findChildren(treeNode,treeNodes));
+                trees.add(findChildren(treeNode, treeNodes));
             }
         }
         return trees;
@@ -290,20 +299,21 @@ public class PermissionServiceImpl implements PermissionService {
 
     /**
      * 递归查找子节点
+     *
      * @param treeNodes
      * @return
      */
-    private static PermissionVo findChildren(PermissionVo treeNode,List<PermissionVo> treeNodes) {
+    private static PermissionVo findChildren(PermissionVo treeNode, List<PermissionVo> treeNodes) {
         treeNode.setChildren(new ArrayList<PermissionVo>());
 
         for (PermissionVo it : treeNodes) {
-            if(treeNode.getId().equals(it.getPid())) {
+            if (treeNode.getId().equals(it.getPid())) {
                 int level = treeNode.getLevel() + 1;
                 it.setLevel(level);
                 if (treeNode.getChildren() == null) {
                     treeNode.setChildren(new ArrayList<>());
                 }
-                treeNode.getChildren().add(findChildren(it,treeNodes));
+                treeNode.getChildren().add(findChildren(it, treeNodes));
             }
         }
         return treeNode;
@@ -355,28 +365,34 @@ public class PermissionServiceImpl implements PermissionService {
                 if (permissionNode.getChildren() == null) {
                     permissionNode.setChildren(new ArrayList<PermissionVo>());
                 }
+                if (it.getType().equals(1)){
+                    it.setTypeName("页面");
+                }else if (it.getType().equals(2)){
+                    it.setTypeName("按钮");
+                }
                 //把查询出来的子菜单放到父菜单里面
                 permissionNode.getChildren().add(selectChildren(it, permissionList));
             }
         }
         return permissionNode;
     }
-//
+
+    //
     //============递归删除菜单==================================
     @Override
     public void removeChildById(PermissionEntity permissionEntity) {
         //校验数据
-        if (StringUtils.isBlank(permissionEntity.getId())){
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不存在");
+        if (StringUtils.isBlank(permissionEntity.getId())) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不存在");
         }
         PermissionEntity permissionEntityLocal = permissionMapper.selectById(permissionEntity.getId());
-        if (permissionEntityLocal == null){
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"此数据不存在");
+        if (permissionEntityLocal == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "此数据不存在");
         }
         //1 创建list集合，用于封装所有删除菜单id值
         List<String> idList = new ArrayList<>();
         //2 向idList集合设置删除菜单id
-        this.selectPermissionChildById(permissionEntity.getId(),idList);
+        this.selectPermissionChildById(permissionEntity.getId(), idList);
         //把当前id封装到list里面
         idList.add(permissionEntity.getId());
 //        baseMapper.deleteBatchIds(idList);
@@ -392,8 +408,8 @@ public class PermissionServiceImpl implements PermissionService {
     //2 根据当前菜单id，查询菜单里面子菜单id，封装到list集合
     private void selectPermissionChildById(String id, List<String> idList) {
         //查询菜单里面子菜单id
-        QueryWrapper<PermissionEntity>  wrapper = new QueryWrapper<>();
-        wrapper.eq("pid",id);
+        QueryWrapper<PermissionEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("pid", id);
         wrapper.select("id");
 //        List<PermissionEntity> childIdList = baseMapper.selectList(wrapper);
         List<PermissionEntity> childIdList = permissionMapper.selectList(wrapper);
@@ -402,27 +418,30 @@ public class PermissionServiceImpl implements PermissionService {
             //封装idList里面
             idList.add(item.getId());
             //递归查询
-            this.selectPermissionChildById(item.getId(),idList);
+            this.selectPermissionChildById(item.getId(), idList);
         });
     }
 
     //=========================给角色分配菜单=======================
     @Override
-    public void saveRolePermissionRealtionShipGuli(String roleId, String[] permissionIds) {
+    public void saveRolePermission(RolePermissionDto rolePermissionDto) {
         //roleId角色id
-        //permissionId菜单id 数组形式
-        //1 创建list集合，用于封装添加数据
-        List<RolePermissionEntity> rolePermissionEntityList = new ArrayList<>();
-        //遍历所有菜单数组
-        for(String perId : permissionIds) {
-            //RolePermission对象
-            RolePermissionEntity rolePermissionEntity = new RolePermissionEntity();
-            rolePermissionEntity.setRoleId(roleId);
-            rolePermissionEntity.setPermissionId(perId);
-            //封装到list集合
-            rolePermissionEntityList.add(rolePermissionEntity);
+        //permissionId菜单id String多个数据使用逗号隔开
+        //删除原有的权限关联数据
+        QueryWrapper<RolePermissionEntity> rolePermissionEntityQueryWrapper = new QueryWrapper<>();
+        rolePermissionEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
+                .eq("role_id", rolePermissionDto.getRoleId());
+        rolePermissionMapper.delete(rolePermissionEntityQueryWrapper);
+
+        //添加分配的权限
+        List<String> permissionIdsList = Arrays.asList(rolePermissionDto.getPermissionIds().split(","));
+        if (permissionIdsList.size() > 0 && permissionIdsList != null) {
+            for (String permissionId : permissionIdsList) {
+                RolePermissionEntity rolePermissionEntity = new RolePermissionEntity();
+                rolePermissionEntity.setRoleId(rolePermissionDto.getRoleId());
+                rolePermissionEntity.setPermissionId(permissionId);
+                rolePermissionMapper.insert(rolePermissionEntity);
+            }
         }
-        //添加到角色菜单关系表
-//        rolePermissionService.saveBatch(rolePermissionList);
     }
 }

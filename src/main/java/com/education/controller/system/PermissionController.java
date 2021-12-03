@@ -1,17 +1,15 @@
 package com.education.controller.system;
 
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.education.common.Result;
+import com.education.dto.system.RolePermissionDto;
 import com.education.entity.system.PermissionEntity;
-import com.education.mapper.system.PermissionMapper;
 import com.education.service.system.PermissionService;
 import com.education.vo.PermissionVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.acl.Group;
 import java.util.List;
 
 
@@ -57,29 +55,34 @@ public class PermissionController {
         return Result.success();
     }
 
+
     /**
-     * @param roleId
-     * @param permissionId
+     * @param rolePermissionDto
      * @return com.education.common.Result
-     * @description 角色分配权限
+     * @description 给角色分配权限
      * @author 橘白
-     * @date 2021/12/1 21:42
+     * @date 2021/12/2 11:54
      */
 
     @PostMapping("/doAssign")
-    public Result doAssign(String roleId, String[] permissionId) {
-        permissionService.saveRolePermissionRealtionShipGuli(roleId, permissionId);
+    public Result doAssign(@RequestBody RolePermissionDto rolePermissionDto) {
+        permissionService.saveRolePermission(rolePermissionDto);
         return Result.success();
     }
 
+    /**
+     * @param rolePermissionDto
+     * @return com.education.common.Result
+     * @description 创建角色分配菜单
+     * @author 橘白
+     * @date 2021/12/2 11:50
+     */
 
-    @GetMapping("toAssign/{roleId}")
-    public Result toAssign(@PathVariable String roleId) {
-        List<PermissionVo> list = permissionService.selectAllMenu(roleId);
+    @PostMapping("/toAssign")
+    public Result toAssign(@RequestBody RolePermissionDto rolePermissionDto) {
+        List<PermissionVo> list = permissionService.selectAllMenu(rolePermissionDto.getRoleId());
         return Result.success().data("children", list);
     }
-//
-//
 
     /**
      * @param permissionEntity

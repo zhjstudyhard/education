@@ -1,6 +1,5 @@
 package com.education.dto.system;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -35,6 +34,10 @@ public class UserDto {
      */
     @NotBlank(message = "用户名不能为空")
     private String username;
+    /**
+     * 登录密码
+     */
+    private String password;
     /**
      * 是否启用（0:启用，1：未启用)
      */
@@ -135,5 +138,13 @@ public class UserDto {
 
     public void setRoleId(String roleId) {
         this.roleId = roleId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -1,6 +1,7 @@
 package com.education.service.system;
 
 import com.education.common.Result;
+import com.education.dto.system.RolePermissionDto;
 import com.education.entity.system.PermissionEntity;
 import com.education.vo.PermissionVo;
 
@@ -50,5 +51,5 @@ public interface PermissionService{
     void removeChildById(PermissionEntity permissionEntity);
 
     //给角色分配权限
-    void saveRolePermissionRealtionShipGuli(String roleId, String[] permissionId);
+    void saveRolePermission(RolePermissionDto rolePermissionDto);
 }

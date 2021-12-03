@@ -29,6 +29,10 @@ public class PermissionVo {
     private Integer type;
 
     /**
+     *  类型中文名
+     */
+    private String typeName;
+    /**
      *  "权限值"
      */
     private String permissionValue;
@@ -149,5 +153,13 @@ public class PermissionVo {
 
     public void setSelect(boolean select) {
         isSelect = select;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 }

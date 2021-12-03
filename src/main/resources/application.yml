@@ -24,3 +24,8 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
 server:
   port: 8089
+security:
+  encryptAESKey: V2FuZzkyNjQ1NGRTQkFQSUpXVA==
+  encryptJWTKey: emhqMTIzNDU2Nzg5MTAxMTEyMA==
+  accessTokenExpireTime: 300
+  refreshTokenExpireTime: 1800
