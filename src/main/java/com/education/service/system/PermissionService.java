@@ -8,12 +8,9 @@ import com.education.vo.PermissionVo;
 import java.util.List;
 
 /**
- * <p>
- * 权限 服务类
- * </p>
- *
- * @author testjava
- * @since 2020-01-12
+ * @description 菜单权限业务
+ * @author 橘白
+ * @date 2021/12/5 15:06
  */
 public interface PermissionService{
 

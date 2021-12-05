@@ -10,4 +10,8 @@ public class Constant {
     public static final int ISDELETED_FALSE = 0;
     //已删除
     public static final int ISDELETED_TRUE = 1;
+    //刷新令牌redis的key
+    public final static String SHIRO_REFRESH_TOKEN = "shiro:refresh_token:";
+    //标志时间戳
+    public final static String CURREN_TIIME_MILLIS = "currentTimeMillis";
 }

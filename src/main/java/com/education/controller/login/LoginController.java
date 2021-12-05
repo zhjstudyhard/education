@@ -34,7 +34,12 @@ public class LoginController {
 
     @PostMapping("/login")
     public Result userLogin(@RequestBody UserDto userDto, HttpServletResponse response) {
-        userLoginService.login(userDto,response);
+        return userLoginService.login(userDto,response);
+    }
+
+    @PostMapping("/logout")
+    public Result userLogOut() {
+        userLoginService.loginOut();
         return Result.success();
     }
 }

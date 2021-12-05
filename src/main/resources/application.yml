@@ -4,11 +4,11 @@ spring:
     password: zhj123459
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/education?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&allowMultiQueries=true
-#  redis:
-#    host: 192.168.160.135
-#    port: 6379
-#    database: 0
-#    password:
+  redis:
+    host: 192.168.160.135
+    port: 6379
+    database: 0
+    password:
   application:
     name: education
   jackson:
@@ -27,5 +27,5 @@ server:
 security:
   encryptAESKey: V2FuZzkyNjQ1NGRTQkFQSUpXVA==
   encryptJWTKey: emhqMTIzNDU2Nzg5MTAxMTEyMA==
-  accessTokenExpireTime: 300
+  accessTokenExpireTime: 30
   refreshTokenExpireTime: 1800

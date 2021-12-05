@@ -23,13 +23,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * <p>
- * 权限 服务实现类
- * </p>
- *
- * @author testjava
- * @since 2020-01-12
+ * @description 菜单权限业务
+ * @author 橘白
+ * @date 2021/12/5 15:06
  */
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class PermissionServiceImpl implements PermissionService {

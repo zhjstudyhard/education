@@ -1,5 +1,6 @@
 package com.education.service.login;
 
+import com.education.common.Result;
 import com.education.dto.system.UserDto;
 
 import javax.servlet.http.HttpServletResponse;
@@ -10,5 +11,7 @@ import javax.servlet.http.HttpServletResponse;
  * @CreateTime: 2021-12-03-11-41
  */
 public interface UserLoginService {
-    void login(UserDto userDto, HttpServletResponse response);
+    Result login(UserDto userDto, HttpServletResponse response);
+
+    void loginOut();
 }

@@ -1,11 +1,14 @@
 package com.education.exceptionhandler;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.education.common.Result;
 import com.education.common.ResultCode;
+import org.apache.shiro.authc.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 /**
  * @Author: haojie
@@ -36,5 +39,20 @@ public class GlobalExceptionHandler {
     public Result ExceptionHandler(MethodArgumentNotValidException e){
         e.printStackTrace();
         return Result.fail().code(ResultCode.FAILER_CODE.getCode()).message(e.getBindingResult().getFieldError().getDefaultMessage());
+    }
+    //校验token
+    @ResponseBody
+    @ExceptionHandler(value = TokenExpiredException.class)
+    public Result ExceptionHandler(TokenExpiredException e){
+        e.printStackTrace();
+        return Result.fail().code(ResultCode.FAILER_CODE.getCode()).message(e.getMessage());
+    }
+
+    //校验异常
+    @ResponseBody
+    @ExceptionHandler(value = AuthenticationException.class)
+    public Result ExceptionHandler(AuthenticationException e){
+        e.printStackTrace();
+        return Result.fail().code(ResultCode.FAILER_CODE.getCode()).message(e.getMessage());
     }
 }

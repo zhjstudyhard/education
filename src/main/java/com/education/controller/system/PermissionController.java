@@ -14,13 +14,12 @@ import java.util.List;
 
 
 /**
- * <p>
- * 权限 菜单管理
- * </p>
- *
- * @author testjava
- * @since 2020-01-12
+ * @description 菜单权限
+ * @param null
+ * @author 橘白
+ * @date 2021/12/5 15:07
  */
+
 @RestController
 @RequestMapping("/api/permission")
 @CrossOrigin
