@@ -31,9 +31,6 @@ export default {
   // 监听器
   watch: {
     $route(to, from) {
-      console.log('路由变化......')
-      console.log(to)
-      console.log(from)
       this.init()
     }
   },
@@ -50,7 +47,8 @@ export default {
       } 
     },
     fetchDataById(roleId){
-        menu.toAssign(roleId).then(response => {
+        let data = { roleId: roleId };
+        menu.toAssign(data).then(response => {
             this.data = response.data.children
             var jsonList = JSON.parse(JSON.stringify(this.data))
             var list = []
@@ -85,17 +83,20 @@ export default {
 
     save(){
       this.saveBtnDisabled = true
-      var ids = this.$refs.tree.getCheckedKeys().join(",");
+      
+      // var ids = this.$refs.tree.getCheckedKeys().join(",");
+       var permissionIds = this.$refs.tree.getCheckedKeys().join(",");
       //vue elementUI tree树形控件获取父节点ID的实例
       //node_modules\element-ui\lib\element-ui.common.js
       //25348行修改源码
-      menu.doAssign(this.roleId, ids).then(response => {
+      let data = { roleId: this.roleId, permissionIds:permissionIds};
+      menu.doAssign(data).then(response => {
           if(response.success){
               this.$message({
                 type:'success',
                 message:'保存成功'
               })
-              this.$router.push({ path: '/acl/role/list' })
+              this.$router.push({ path: '/permission/role' })
             }
       })
     }

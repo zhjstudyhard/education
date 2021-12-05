@@ -181,7 +181,8 @@ export const asyncRoutes = [
         name: '角色权限',
         meta: {
           title: '角色权限',
-        }
+        },
+        hidden:true
       },
       {
         path: 'menus',

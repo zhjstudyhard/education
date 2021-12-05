@@ -20,7 +20,7 @@
       :expand-row-keys="expandRow"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
-    <!-- default-expand-all -->
+      <!-- default-expand-all -->
       <el-table-column prop="name" label="名称" sortable width="180">
       </el-table-column>
       <el-table-column prop="path" label="访问路径" sortable width="180">
@@ -28,6 +28,11 @@
       <el-table-column prop="component" label="组件路径" sortable width="180">
       </el-table-column>
       <el-table-column prop="permissionValue" label="权限值"> </el-table-column>
+      <el-table-column
+        prop="typeName"
+        label="类型"
+      >
+      </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <!-- v-if="node.level == 1 || node.level == 2" v-if="node.level == 3" v-if="node.level == 4"-->
@@ -209,6 +214,18 @@ export default {
   },
 
   methods: {
+    // 权限类别转换
+    // formatPrivilegeType: function (row, column) {
+    //   if (row.privilegeType === "1") {
+    //     return "目录";
+    //   } else if (row.privilegeType === "2") {
+    //     return "菜单";
+    //   } else if (row.privilegeType === "3") {
+    //     return "按钮";
+    //   } else {
+    //     return "";
+    //   }
+    // },
     //  树形表格过滤
     handleTreeData(treeData, searchValue) {
       if (!treeData || treeData.length === 0) {

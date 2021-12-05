@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-21 19:30:08
- * @LastEditTime: 2021-11-23 20:59:18
+ * @LastEditTime: 2021-12-03 13:37:29
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \vue-element-admin-master\src\views\permission\userList.vue
@@ -44,7 +44,7 @@
       style="width: 100%; margin-top: 30px"
       border
     >
-    <el-table-column align="center" label="序号" width="50">
+      <el-table-column align="center" label="序号" width="50">
         <template slot-scope="scope">
           {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
@@ -92,22 +92,28 @@
     <el-dialog
       :visible.sync="dialogVisible"
       :title="dialogType === 'edit' ? '修改字典' : '新增字典'"
-      @close='closeDialog'
+      @close="closeDialog"
     >
-      <el-form :model="dictionary" label-width="80px" label-position="left">
-        <el-form-item label="字典编码">
+      <el-form
+        ref="dictionary"
+        :model="dictionary"
+        :rules="dictionaryValidateRules"
+        label-width="80px"
+        label-position="left"
+      >
+        <el-form-item label="字典编码" :required="true">
           <el-input
             v-model="dictionary.dictionaryCode"
             placeholder="字典编码"
           />
         </el-form-item>
-        <el-form-item label="字典内容">
+        <el-form-item label="字典内容" :required="true">
           <el-input
             v-model="dictionary.dictionaryValue"
             placeholder="字典内容"
           />
         </el-form-item>
-        <el-form-item label="字典类型">
+        <el-form-item label="字典类型" :required="true">
           <el-input
             v-model="dictionary.dictionaryType"
             placeholder="字典类型"
@@ -115,9 +121,7 @@
         </el-form-item>
       </el-form>
       <div style="text-align: right">
-        <el-button type="danger" @click="dialogVisible = false"
-          >取消</el-button
-        >
+        <el-button type="danger" @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="confirmDictionary">确认</el-button>
       </div>
     </el-dialog>
@@ -134,7 +138,6 @@
 
 <script>
 import dictionary from "@/api/system/dictionary";
-import axios from "axios";
 export default {
   data() {
     return {
@@ -144,7 +147,7 @@ export default {
       dictionaryList: [],
       input: "",
       dictionary: {
-        id:"",
+        id: "",
         dictionaryCode: "",
         dictionaryValue: "",
         dictionaryType: "",
@@ -159,6 +162,17 @@ export default {
       dialogVisible: false,
       dialogType: "new",
       checkStrictly: false,
+      dictionaryValidateRules: {
+        dictionaryCode: [
+          { required: true, trigger: "blur", message: "字典编码不能为空" },
+        ],
+        dictionaryValue: [
+          { required: true, trigger: "blur", message: "字典内容不能为空" },
+        ],
+        dictionaryType: [
+          { required: true, trigger: "blur", message: "字典类型不能为空" },
+        ],
+      },
     };
   },
   created() {
@@ -184,12 +198,13 @@ export default {
     },
     //删除数据字典
     handleDelete(id) {
-      let data = {id:id}
+      let data = { id: id };
       this.$confirm("确认删除当前数据字典?", "Warning", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning",
-      }).then((response) => {
+      })
+        .then((response) => {
           dictionary.deleteDictionary(data).then((response) => {
             this.$message({
               type: "success",
@@ -216,31 +231,30 @@ export default {
       this.dictionary = JSON.parse(JSON.stringify(scope.row));
     },
     async confirmDictionary() {
-      const isEdit = this.dialogType === 'edit'
+      const isEdit = this.dialogType === "edit";
       if (isEdit) {
-        await dictionary.editDictionary(this.dictionary).then(response =>{
-           this.$message({
-              type: "success",
-              message: "修改成功!",
-            });
-            this.getDictionaryList(1);
-        })
-        
+        await dictionary.editDictionary(this.dictionary).then((response) => {
+          this.$message({
+            type: "success",
+            message: "修改成功!",
+          });
+          this.getDictionaryList(1);
+        });
       } else {
-        await dictionary.addDictionary(this.dictionary).then(response =>{
-           this.$message({
-              type: "success",
-              message: "添加成功!",
-            });
-            this.getDictionaryList(1);
-        })
+        await dictionary.addDictionary(this.dictionary).then((response) => {
+          this.$message({
+            type: "success",
+            message: "添加成功!",
+          });
+          this.getDictionaryList(1);
+        });
       }
       this.dialogVisible = false;
     },
     //对话框关闭事件
-    closeDialog(){
-      this.dictionary = {}
-    }
+    closeDialog() {
+      this.dictionary = {};
+    },
   },
 };
 </script>

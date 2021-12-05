@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-11-21 19:30:08
- * @LastEditTime: 2021-11-24 16:05:05
+ * @LastEditTime: 2021-12-03 20:36:52
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \vue-element-admin-master\src\views\permission\userList.vue
@@ -61,11 +61,11 @@
           {{ scope.row.enabled == 0 ? "是" : "否" }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="是否过期" width="50">
+      <!-- <el-table-column align="center" label="是否过期" width="50">
         <template slot-scope="scope">
           {{ scope.row.isExpired == 0 ? "否" : "是" }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column align="center" label="是否锁定" width="50">
         <template slot-scope="scope">
           {{ scope.row.locked == 0 ? "否" : "是" }}
@@ -131,19 +131,19 @@
       <el-form :model="user" label-width="80px" label-position="left">
         <el-row>
           <el-col :span="10">
-            <el-form-item label="用户名" style="margin-right: 30px">
+            <el-form-item label="用户名" style="margin-right: 30px" :required="true">
               <el-input v-model="user.username" placeholder="用户名" />
             </el-form-item>
           </el-col>
           <el-col :span="10">
-            <el-form-item label="真实姓名">
+            <el-form-item label="真实姓名" :required="true">
               <el-input v-model="user.realName" placeholder="真实姓名" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="10">
-            <el-form-item label="角色" style="margin-right: 30px">
+            <el-form-item label="角色" style="margin-right: 30px" :required="true">
               <el-select
                 v-model="user.roleId"
                 placeholder="选择角色"
@@ -158,7 +158,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="10">
-            <el-form-item label="状态">
+            <el-form-item label="状态" :required="true">
               <el-select v-model="user.enabled" placeholder="启用或禁用">
                 <el-option label="启用" :value="0"></el-option>
                 <el-option label="停用" :value="1"></el-option>
