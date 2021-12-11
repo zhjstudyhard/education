@@ -1,5 +1,6 @@
 package com.education.service.system;
 
+import com.alibaba.fastjson.JSONObject;
 import com.education.common.Result;
 import com.education.dto.system.RolePermissionDto;
 import com.education.entity.system.PermissionEntity;
@@ -49,4 +50,6 @@ public interface PermissionService{
 
     //给角色分配权限
     void saveRolePermission(RolePermissionDto rolePermissionDto);
+    //查询当前用户的菜单权限
+    List<JSONObject> getMenu(String id);
 }

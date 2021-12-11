@@ -1,5 +1,6 @@
 package com.education.service.serviceImpl.system;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.ResultCode;
 import com.education.constant.Constant;
@@ -10,7 +11,9 @@ import com.education.exceptionhandler.EducationException;
 import com.education.mapper.system.PermissionMapper;
 import com.education.mapper.system.RolePermissionMapper;
 import com.education.service.system.PermissionService;
+import com.education.util.EntityUtil;
 import com.education.vo.PermissionVo;
+import com.sun.javafx.tk.PermissionHelper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +26,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @description 菜单权限业务
  * @author 橘白
+ * @description 菜单权限业务
  * @date 2021/12/5 15:06
  */
 
@@ -64,6 +67,8 @@ public class PermissionServiceImpl implements PermissionService {
         if (permissionEntityLocalRepart != null) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "访问路径重复");
         }
+        //创建人信息
+        EntityUtil.addCreateInfo(permissionEntity);
         permissionMapper.insert(permissionEntity);
     }
 
@@ -97,6 +102,8 @@ public class PermissionServiceImpl implements PermissionService {
         PermissionEntity permissionEntityLocal = permissionMapper.selectById(permissionEntity.getId());
         BeanUtils.copyProperties(permissionEntity, permissionEntityLocal);
 
+        //更新人信息
+        EntityUtil.addModifyInfo(permissionEntityLocal);
         permissionMapper.updateById(permissionEntityLocal);
     }
 
@@ -117,6 +124,8 @@ public class PermissionServiceImpl implements PermissionService {
         if (permissionEntityLocal != null) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "功能权限值已存在");
         }
+        //创建人信息
+        EntityUtil.addCreateInfo(permissionEntityLocal);
         permissionMapper.insert(permissionEntity);
     }
 
@@ -142,6 +151,8 @@ public class PermissionServiceImpl implements PermissionService {
         permissionEntityLocal.setPath(permissionEntity.getPath());
         permissionEntityLocal.setComponent(permissionEntity.getComponent());
 
+        //更新人信息
+        EntityUtil.addModifyInfo(permissionEntityLocal);
         permissionMapper.updateById(permissionEntityLocal);
     }
 
@@ -363,9 +374,9 @@ public class PermissionServiceImpl implements PermissionService {
                 if (permissionNode.getChildren() == null) {
                     permissionNode.setChildren(new ArrayList<PermissionVo>());
                 }
-                if (it.getType().equals(1)){
+                if (it.getType().equals(1)) {
                     it.setTypeName("页面");
-                }else if (it.getType().equals(2)){
+                } else if (it.getType().equals(2)) {
                     it.setTypeName("按钮");
                 }
                 //把查询出来的子菜单放到父菜单里面
@@ -398,7 +409,8 @@ public class PermissionServiceImpl implements PermissionService {
             PermissionEntity permissionEntityUpdate = new PermissionEntity();
             permissionEntityUpdate.setId(id);
             permissionEntityUpdate.setIsDeleted(1);
-
+            //更新人信息
+            EntityUtil.addModifyInfo(permissionEntityUpdate);
             permissionMapper.updateById(permissionEntityUpdate);
         }
     }
@@ -438,8 +450,87 @@ public class PermissionServiceImpl implements PermissionService {
                 RolePermissionEntity rolePermissionEntity = new RolePermissionEntity();
                 rolePermissionEntity.setRoleId(rolePermissionDto.getRoleId());
                 rolePermissionEntity.setPermissionId(permissionId);
+                //创建人信息
+                EntityUtil.addCreateInfo(rolePermissionEntity);
                 rolePermissionMapper.insert(rolePermissionEntity);
             }
         }
     }
+
+    @Override
+    public List<JSONObject> getMenu(String id) {
+        List<PermissionVo> selectPermissionList = permissionMapper.selectPermissionByUserId(id);
+        List<PermissionVo> resultList = bulidPermission(selectPermissionList);
+        List<JSONObject> permissionList = bulidMenus(resultList);
+        return permissionList;
+    }
+
+    /**
+     * 构建菜单
+     *
+     * @param treeNodes
+     * @return
+     */
+    public static List<JSONObject> bulidMenus(List<PermissionVo> treeNodes) {
+        List<JSONObject> meuns = new ArrayList<>();
+        if (treeNodes.size() == 1) {
+            PermissionVo topNode = treeNodes.get(0);
+            //1.左侧除去全部数据目录以外的菜单进行遍历（比如系统管理目录）
+            List<PermissionVo> oneMeunList = topNode.getChildren();
+            for (PermissionVo one : oneMeunList) {
+                JSONObject oneMeun = new JSONObject();
+                oneMeun.put("path", one.getPath());
+                oneMeun.put("component", one.getComponent());
+                oneMeun.put("redirect", "noredirect");
+                oneMeun.put("name", "name_" + one.getId());
+                oneMeun.put("hidden", false);
+
+                JSONObject oneMeta = new JSONObject();
+                oneMeta.put("title", one.getName());
+                oneMeta.put("icon", one.getIcon());
+                oneMeun.put("meta", oneMeta);
+
+                List<JSONObject> children = new ArrayList<>();
+                List<PermissionVo> twoMeunList = one.getChildren();
+                //2.遍历目录下的所有菜单加入到第二级目录的childen集合（比如系统管理下的所有菜单目录下的所有一级目录，就像系统管理目录）
+                for (PermissionVo two : twoMeunList) {
+                    JSONObject twoMeun = new JSONObject();
+                    twoMeun.put("path", two.getPath());
+                    twoMeun.put("component", two.getComponent());
+                    twoMeun.put("name", "name_" + two.getId());
+                    twoMeun.put("hidden", false);
+
+                    JSONObject twoMeta = new JSONObject();
+                    twoMeta.put("title", two.getName());
+                    twoMeun.put("meta", twoMeta);
+
+                    children.add(twoMeun);
+
+                    List<PermissionVo> threeMeunList = two.getChildren();
+                    //遍历菜单下的按钮所对应的菜单加入到children集合
+                    for (PermissionVo three : threeMeunList) {
+                        if (StringUtils.isEmpty(three.getPath())) {
+                            continue;
+                        }
+
+                        JSONObject threeMeun = new JSONObject();
+                        threeMeun.put("path", three.getPath());
+                        threeMeun.put("component", three.getComponent());
+                        threeMeun.put("name", "name_" + three.getId());
+                        threeMeun.put("hidden", true);
+
+                        JSONObject threeMeta = new JSONObject();
+                        threeMeta.put("title", three.getName());
+                        threeMeun.put("meta", threeMeta);
+
+                        children.add(threeMeun);
+                    }
+                }
+                oneMeun.put("children", children);
+                meuns.add(oneMeun);
+            }
+        }
+        return meuns;
+    }
+
 }

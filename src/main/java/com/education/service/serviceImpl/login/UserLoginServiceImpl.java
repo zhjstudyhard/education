@@ -12,6 +12,8 @@ import com.education.exceptionhandler.EducationException;
 import com.education.mapper.system.UserMapper;
 import com.education.service.login.UserLoginService;
 import com.education.util.JWTUntils;
+import com.education.util.MD5Util;
+import com.education.util.RSAUtil;
 import com.education.util.RedisUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.crypto.Data;
+import java.security.Security;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +47,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 //    private String refreshTokenExpireTime;
 
     @Override
-    public Result login(UserDto userDto, HttpServletResponse response) {
+    public Result login(UserDto userDto, HttpServletResponse response) throws Exception {
        if (StringUtils.isBlank(userDto.getUsername())){
            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"用户名不能为空");
        }
@@ -63,7 +66,11 @@ public class UserLoginServiceImpl implements UserLoginService {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(),"账号已锁定，请联系管理员");
         }
         //校验密码正确性和账号是否过期
-        if (userDto.getPassword().equals(userEntity.getPassword())){
+        //1.密码RSA解密
+        String password = RSAUtil.decrypt(userDto.getPassword(), SecurityBean.encryptRSAKey);
+        //2.Md5加密
+        String md5Password = MD5Util.encrypt(password);
+        if (md5Password.equals(userEntity.getPassword())){
             Date expired = userEntity.getExpired();
             Date nowDate = new Date();
             if (expired.getTime() < nowDate.getTime()){
@@ -91,6 +98,12 @@ public class UserLoginServiceImpl implements UserLoginService {
     public void loginOut() {
         Subject subject = SecurityUtils.getSubject();
         boolean authenticated = subject.isAuthenticated();
-        subject.logout();
+        if (authenticated){
+            UserEntity userEntity = (UserEntity) subject.getPrincipal();
+            //用户登出
+            subject.logout();
+            RedisUtil.delete(Constant.SHIRO_REFRESH_TOKEN + userEntity.getUsername());
+        }
     }
+
 }

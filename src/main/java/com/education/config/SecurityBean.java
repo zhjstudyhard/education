@@ -26,6 +26,11 @@ public class SecurityBean {
      */
     public static String encryptJWTKey;
 
+    /**
+     * RSA私钥(RSA私钥)
+     */
+    public static String encryptRSAKey;
+
     @Value("${security.refreshTokenExpireTime}")
     private void setRefreshTokenExpireTime(String refreshTokenExpireTime) {
         SecurityBean.refreshTokenExpireTime = refreshTokenExpireTime;
@@ -42,5 +47,13 @@ public class SecurityBean {
     @Value("${security.encryptJWTKey}")
     private void setEncryptJWTKey(String encryptJWTKey) {
         SecurityBean.encryptJWTKey = encryptJWTKey;
+    }
+
+    /**
+     * RSA算法私钥
+     */
+    @Value("${security.encryptRSAKey}")
+    public void setEncryptRSAKey(String encryptRSAKey) {
+        SecurityBean.encryptRSAKey = encryptRSAKey;
     }
 }

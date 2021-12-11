@@ -33,7 +33,7 @@ public class LoginController {
      */
 
     @PostMapping("/login")
-    public Result userLogin(@RequestBody UserDto userDto, HttpServletResponse response) {
+    public Result userLogin(@RequestBody UserDto userDto, HttpServletResponse response) throws Exception {
         return userLoginService.login(userDto,response);
     }
 

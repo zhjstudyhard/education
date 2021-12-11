@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
  * @CreateTime: 2021-12-03-11-41
  */
 public interface UserLoginService {
-    Result login(UserDto userDto, HttpServletResponse response);
+    Result login(UserDto userDto, HttpServletResponse response) throws Exception;
 
     void loginOut();
 }

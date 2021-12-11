@@ -1,22 +1,33 @@
 package com.education.controller.system;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.education.common.Result;
 import com.education.dto.system.RolePermissionDto;
 import com.education.entity.system.PermissionEntity;
+import com.education.entity.system.UserEntity;
 import com.education.service.system.PermissionService;
 import com.education.vo.PermissionVo;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
 
 /**
- * @description 菜单权限
  * @param null
  * @author 橘白
+ * @description 菜单权限
  * @date 2021/12/5 15:07
  */
 
@@ -41,9 +52,9 @@ public class PermissionController {
         return Result.success().data("children", list);
     }
 
-    /*
+    /**
+     * @param
      * @description 删除权限
-     * @param null
      * @author 橘白
      * @date 2021/12/1 21:41
      */
@@ -134,5 +145,15 @@ public class PermissionController {
         permissionService.updateButton(permissionEntity);
         return Result.success();
     }
+
+
+    @PostMapping("getMenu")
+    public Result getMenu() {
+        Subject subject = SecurityUtils.getSubject();
+        UserEntity userEntity = (UserEntity) subject.getPrincipal();
+        List<JSONObject> permissionList = permissionService.getMenu(userEntity.getId());
+        return Result.success().data("permissionList", permissionList);
+    }
+
 }
 

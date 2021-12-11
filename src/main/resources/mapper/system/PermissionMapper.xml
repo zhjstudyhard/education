@@ -15,4 +15,15 @@
         select * from b_permission where is_deleted = 0
         order by CAST(id AS SIGNED)
     </select>
+    <select id="selectPermissionByUserId" resultType="com.education.vo.PermissionVo">
+        select
+        p.*
+        from b_userrole ur
+        inner join b_rolepermission rp on rp.role_id = ur.role_id
+        inner join b_permission p on p.id = rp.permission_id
+        where ur.user_id = #{userId}
+        and ur.is_deleted = 0
+        and rp.is_deleted = 0
+        and p.is_deleted = 0
+    </select>
 </mapper>

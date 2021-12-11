@@ -10,6 +10,7 @@ import com.education.entity.system.DictionaryEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.system.DictionaryMapper;
 import com.education.service.system.DictionaryService;
+import com.education.util.EntityUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
@@ -52,6 +53,8 @@ public class DictionaryServiceImpl implements DictionaryService {
           throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
       }
       dictionaryEntity.setIsDeleted(1);
+        //更新数据人信息
+      EntityUtil.addModifyInfo(dictionaryEntity);
       dictionaryMapper.updateById(dictionaryEntity);
     }
 
@@ -75,6 +78,8 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionaryEntityLocal.setDictionaryCode(dictionaryDto.getDictionaryCode());
         dictionaryEntityLocal.setDictionaryType(dictionaryDto.getDictionaryType());
         dictionaryEntityLocal.setDictionaryValue(dictionaryDto.getDictionaryValue());
+        //更新数据人信息
+        EntityUtil.addModifyInfo(dictionaryEntityLocal);
         dictionaryMapper.updateById(dictionaryEntityLocal);
     }
 
@@ -91,7 +96,8 @@ public class DictionaryServiceImpl implements DictionaryService {
         //copy数据
         DictionaryEntity dictionaryEntity = new DictionaryEntity();
         BeanUtils.copyProperties(dictionaryDto, dictionaryEntity);
-
+        //创建人信息
+        EntityUtil.addCreateInfo(dictionaryEntity);
         dictionaryMapper.insert(dictionaryEntity);
     }
 }

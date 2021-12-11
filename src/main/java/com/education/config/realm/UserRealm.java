@@ -88,7 +88,7 @@ public class UserRealm extends AuthorizingRealm {
                 //判断AccessToken和refreshToken的时间节点是否一致
                 Long current = Long.parseLong(RedisUtil.get(Constant.SHIRO_REFRESH_TOKEN + username));
                 if (current.equals(Long.parseLong(JWTUntils.getClaim(token,Constant.CURREN_TIIME_MILLIS)))) {
-                    return new SimpleAuthenticationInfo(token, token, "MyRealm");
+                    return new SimpleAuthenticationInfo(userEntity, token, getName());
                 } else {
                     throw new AuthenticationException("token已经失效，请重新登录！");
                 }

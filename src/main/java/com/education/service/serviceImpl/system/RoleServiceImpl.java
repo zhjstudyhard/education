@@ -12,6 +12,7 @@ import com.education.entity.system.RoleEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.system.RoleMapper;
 import com.education.service.system.RoleService;
+import com.education.util.EntityUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.HashMap;
 import java.util.List;
 
@@ -61,6 +63,8 @@ public class RoleServiceImpl implements RoleService {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
         }
         roleEntity.setIsDeleted(1);
+        //更新人信息
+        EntityUtil.addModifyInfo(roleEntity);
         roleMapper.updateById(roleEntity);
     }
 
@@ -83,6 +87,8 @@ public class RoleServiceImpl implements RoleService {
         //更新角色
         roleEntityLocal.setRoleCode(roleDto.getRoleCode());
         roleEntityLocal.setRoleName(roleDto.getRoleName());
+        //更新人信息
+        EntityUtil.addModifyInfo(roleEntityLocal);
         roleMapper.updateById(roleEntityLocal);
     }
 
@@ -100,6 +106,8 @@ public class RoleServiceImpl implements RoleService {
         RoleEntity roleEntity = new RoleEntity();
         BeanUtils.copyProperties(roleDto, roleEntity);
 
+        //创建人信息
+        EntityUtil.addCreateInfo(roleEntity);
         roleMapper.insert(roleEntity);
     }
 }

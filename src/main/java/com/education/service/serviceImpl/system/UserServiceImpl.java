@@ -16,6 +16,7 @@ import com.education.mapper.system.UserMapper;
 import com.education.mapper.system.UserRoleMapper;
 import com.education.service.system.DictionaryService;
 import com.education.service.system.UserService;
+import com.education.util.EntityUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
@@ -61,6 +62,8 @@ public class UserServiceImpl implements UserService {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
         }
         userEntity.setIsDeleted(1);
+        //更信任信息
+        EntityUtil.addModifyInfo(userEntity);
         userMapper.updateById(userEntity);
     }
 
@@ -97,6 +100,8 @@ public class UserServiceImpl implements UserService {
         UserRoleEntity userRoleEntity = userRoleMapper.selectOne(userRoleEntityQueryWrapper);
         if (userRoleEntity != null ){
             userRoleEntity.setRoleId(userDto.getRoleId());
+            //更信任信息
+            EntityUtil.addModifyInfo(userRoleEntity);
             userRoleMapper.updateById(userRoleEntity);
         }
     }
@@ -122,7 +127,8 @@ public class UserServiceImpl implements UserService {
         UserRoleEntity userRoleEntity = new UserRoleEntity();
         userRoleEntity.setUserId(userEntity.getId());
         userRoleEntity.setRoleId(userDto.getRoleId());
-
+        //创建人信息
+        EntityUtil.addCreateInfo(userRoleEntity);
         userRoleMapper.insert(userRoleEntity);
     }
 }
