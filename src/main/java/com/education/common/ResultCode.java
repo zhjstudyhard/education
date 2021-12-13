@@ -10,7 +10,10 @@ public enum ResultCode {
     //成功状态码
     SUCCESS_CODE(20000),
     //失败状态码
-    FAILER_CODE(20001);
+    FAILER_CODE(20001),
+
+    //token校验失败状态码
+    TOKEN_FAILER_CODE(401);
     /**
      * 返回码
      */

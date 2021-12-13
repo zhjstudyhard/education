@@ -7,6 +7,7 @@ import com.education.entity.system.PermissionEntity;
 import com.education.vo.PermissionVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @description 菜单权限业务
@@ -52,4 +53,6 @@ public interface PermissionService{
     void saveRolePermission(RolePermissionDto rolePermissionDto);
     //查询当前用户的菜单权限
     List<JSONObject> getMenu(String id);
+    //查询当前用户信息
+    Map<String, Object> getUserInfo(String id);
 }

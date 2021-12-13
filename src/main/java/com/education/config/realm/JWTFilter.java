@@ -1,8 +1,12 @@
 package com.education.config.realm;
 
+import com.alibaba.fastjson.JSON;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.education.common.Result;
+import com.education.common.ResultCode;
 import com.education.config.SecurityBean;
 import com.education.constant.Constant;
+import com.education.exceptionhandler.EducationException;
 import com.education.util.JWTUntils;
 import com.education.util.RedisUtil;
 import lombok.SneakyThrows;
@@ -10,7 +14,9 @@ import org.apache.logging.log4j.util.PropertiesUtil;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -18,6 +24,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -60,16 +68,11 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
                     String result = refreshToken(request, response);
                     if (result.equals("success")) {
                         return true;
+                    }else {
+                        exceptionResponse(ResultCode.TOKEN_FAILER_CODE.getCode(), result, response);
                     }
-                } else if (e instanceof AuthenticationException) {
-                    try {
-                        // 异常捕获，发送到authenticationException
-                        request.setAttribute("authenticationException", e);
-                        //将异常分发到/authenticationException控制器
-                        request.getRequestDispatcher("/authenticationException").forward(request, response);
-                    } catch (Exception e2) {
-                        e2.printStackTrace();
-                    }
+                } else {
+                    exceptionResponse(ResultCode.TOKEN_FAILER_CODE.getCode(), e.getMessage(), response);
                 }
                 return false;
             }
@@ -125,5 +128,44 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
             }
         }
         return "token认证失效，token过期，重新登陆";
+    }
+
+    private void exceptionResponse(int code, String msg, ServletResponse response) {
+        //返回结果异常
+        Result result = Result.fail().code(code).message(msg);
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        httpServletResponse.setContentType("application/json; charset=utf-8");
+        httpServletResponse.setCharacterEncoding("UTF-8");
+        PrintWriter writer = null;
+        try {
+            writer = response.getWriter();
+            writer.write(JSON.toJSONString(result));
+            writer.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
+
+    /**
+     * 对跨域提供支持
+     */
+    @Override
+    protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        httpServletResponse.setHeader("Access-control-Allow-Origin", httpServletRequest.getHeader("Origin"));
+        httpServletResponse.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
+        httpServletResponse.setHeader("Access-Control-Allow-Headers",
+                httpServletRequest.getHeader("Access-Control-Request-Headers"));
+        // 跨域时会首先发送一个OPTIONS请求，这里我们给OPTIONS请求直接返回正常状态
+        if (httpServletRequest.getMethod().equals(RequestMethod.OPTIONS.name())) {
+            httpServletResponse.setStatus(HttpStatus.OK.value());
+            return false;
+        }
+        return super.preHandle(request, response);
     }
 }

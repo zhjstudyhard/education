@@ -21,4 +21,8 @@ public interface PermissionMapper extends BaseMapper<PermissionEntity> {
     List<PermissionVo> selectAllPermission();
 
     List<PermissionVo> selectPermissionByUserId(String id);
+
+    List<String> selectPermissionValueByUserId(String id);
+
+    List<String> selectAllPermissionValue();
 }

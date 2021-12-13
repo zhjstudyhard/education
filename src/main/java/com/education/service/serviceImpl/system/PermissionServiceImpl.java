@@ -2,14 +2,13 @@ package com.education.service.serviceImpl.system;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.education.EducationApplication;
 import com.education.common.ResultCode;
 import com.education.constant.Constant;
 import com.education.dto.system.RolePermissionDto;
-import com.education.entity.system.PermissionEntity;
-import com.education.entity.system.RolePermissionEntity;
+import com.education.entity.system.*;
 import com.education.exceptionhandler.EducationException;
-import com.education.mapper.system.PermissionMapper;
-import com.education.mapper.system.RolePermissionMapper;
+import com.education.mapper.system.*;
 import com.education.service.system.PermissionService;
 import com.education.util.EntityUtil;
 import com.education.vo.PermissionVo;
@@ -20,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,12 +37,14 @@ public class PermissionServiceImpl implements PermissionService {
     @Autowired
     private RolePermissionMapper rolePermissionMapper;
 
-//    @Autowired
-//    private RolePermissionService rolePermissionService;
+    @Autowired
+    private UserMapper userMapper;
 
-//    @Autowired
-//    private UserService userService;
-//
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Override
     public void save(PermissionEntity permissionEntity) {
@@ -125,7 +124,7 @@ public class PermissionServiceImpl implements PermissionService {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "功能权限值已存在");
         }
         //创建人信息
-        EntityUtil.addCreateInfo(permissionEntityLocal);
+        EntityUtil.addCreateInfo(permissionEntity);
         permissionMapper.insert(permissionEntity);
     }
 
@@ -176,7 +175,6 @@ public class PermissionServiceImpl implements PermissionService {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "角色id为空");
         }
         List<PermissionVo> allPermissionList = permissionMapper.selectAllPermission();
-//        List<PermissionEntity> allPermissionList = permissionMapper.selectList(new QueryWrapper<PermissionEntity>().eq("is_deleted",Constant.ISDELETED_FALSE).orderByAsc("CAST(id AS SIGNED)"));
         //根据角色id获取角色权限
         List<RolePermissionEntity> rolePermissionEntityList = rolePermissionMapper.selectList(new QueryWrapper<RolePermissionEntity>().eq("role_id", roleId).eq("is_deleted", Constant.ISDELETED_FALSE));
         //转换给角色id与角色权限对应Map对象
@@ -533,4 +531,42 @@ public class PermissionServiceImpl implements PermissionService {
         return meuns;
     }
 
+    @Override
+    public Map<String, Object> getUserInfo(String id) {
+        //结果集
+        Map<String, Object> result = new HashMap<>();
+        //校验用户
+        UserEntity userEntity = userMapper.selectById(id);
+        if (null == userEntity) {
+           throw new EducationException(ResultCode.FAILER_CODE.getCode(),"用户不存在或者用户登陆失效");
+        }
+        //根据用户id获取角色
+        QueryWrapper<UserRoleEntity> userRoleEntityQueryWrapper = new QueryWrapper<>();
+        userRoleEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
+                .eq("user_id",id);
+        List<UserRoleEntity> userRoleEntities = userRoleMapper.selectList(userRoleEntityQueryWrapper);
+        //处理数据
+        List<String> userIds = userRoleEntities.stream().map(userRoleEntity -> userRoleEntity.getRoleId()).collect(Collectors.toList());
+        List<RoleEntity> roleEntityList = roleMapper.selectBatchIds(userIds);
+        //获取当前用户角色编码
+        List<String> roleCodedList = roleEntityList.stream().map(o -> o.getRoleCode()).collect(Collectors.toList());
+        if (roleCodedList.size() == 0){
+            roleCodedList.add("");
+        }
+        //根据用户id获取操作按钮权限值
+        List<String> permissionValueList = null;
+//        if(this.isSysAdmin(id)) {
+//            //如果是系统管理员，获取所有权限
+//            permissionValueList = permissionMapper.selectAllPermissionValue();
+//        } else {
+        permissionValueList = permissionMapper.selectPermissionValueByUserId(id);
+//        }
+//        redisTemplate.opsForValue().set(username, permissionValueList);
+
+        result.put("username", userEntity.getUsername());
+        result.put("avatar", "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif");
+        result.put("roles", roleCodedList);
+        result.put("permissionValueList", permissionValueList);
+        return result;
+    }
 }

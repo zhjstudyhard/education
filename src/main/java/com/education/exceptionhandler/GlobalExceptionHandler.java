@@ -49,20 +49,4 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return Result.fail().code(ResultCode.FAILER_CODE.getCode()).message(e.getMessage());
     }
-
-    //token校验异常
-    @ResponseBody
-    @ExceptionHandler(value = AuthenticationException.class)
-    public Result ExceptionHandler(AuthenticationException e){
-        e.printStackTrace();
-        return Result.fail().code(ResultCode.FAILER_CODE.getCode()).message(e.getMessage());
-    }
-
-    //token校验异常
-    @ResponseBody
-    @ExceptionHandler(value = SignatureException.class)
-    public Result ExceptionHandler(SignatureException e){
-        e.printStackTrace();
-        return Result.fail().code(ResultCode.FAILER_CODE.getCode()).message(e.getMessage());
-    }
 }

@@ -22,10 +22,10 @@ import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
+import java.util.Map;
 
 
 /**
- * @param null
  * @author 橘白
  * @description 菜单权限
  * @date 2021/12/5 15:07
@@ -146,6 +146,12 @@ public class PermissionController {
         return Result.success();
     }
 
+    /**
+     * @return com.education.common.Result
+     * @description 获取当前用户的菜单(动态菜单)
+     * @author 橘白
+     * @date 2021/12/12 15:16
+     */
 
     @PostMapping("getMenu")
     public Result getMenu() {
@@ -155,5 +161,20 @@ public class PermissionController {
         return Result.success().data("permissionList", permissionList);
     }
 
+
+    /**
+     * @return com.education.common.Result
+     * @description 查询当前用户信息
+     * @author 橘白
+     * @date 2021/12/13 15:55
+     */
+
+    @PostMapping("getUserInfo")
+    public Result getUserInfo() {
+        Subject subject = SecurityUtils.getSubject();
+        UserEntity userEntity = (UserEntity) subject.getPrincipal();
+        Map<String, Object> userInfo = permissionService.getUserInfo(userEntity.getId());
+        return Result.success().data("data", userInfo);
+    }
 }
 
