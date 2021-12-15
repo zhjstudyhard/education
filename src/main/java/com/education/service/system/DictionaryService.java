@@ -3,6 +3,9 @@ package com.education.service.system;
 import com.education.common.Result;
 import com.education.dto.base.ResponsePageDto;
 import com.education.dto.system.DictionaryDto;
+import com.education.entity.system.DictionaryEntity;
+
+import java.util.List;
 
 /**
  * @Author: haojie
@@ -23,4 +26,6 @@ public interface DictionaryService {
     void editDictionary(DictionaryDto dictionaryDto);
 
     void addDictionary(DictionaryDto dictionaryDto);
+
+    Result queryDictionaryByType(DictionaryDto dictionaryDto);
 }

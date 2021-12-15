@@ -21,7 +21,7 @@ import java.util.Map;
  * @CreateTime: 2021-02-04-13-32
  */
 @Configuration
-public class shiroConfig {
+public class ShiroConfig {
     @Bean
     @Qualifier(value = "userRealm")
     public UserRealm userRealm() {
@@ -75,6 +75,5 @@ public class shiroConfig {
     public static DefaultAdvisorAutoProxyCreator getDefaultAdvisorAutoProxyCreator() {
         DefaultAdvisorAutoProxyCreator creator = new DefaultAdvisorAutoProxyCreator();
         return creator;
-
     }
 }

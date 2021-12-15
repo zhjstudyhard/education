@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Author: haojie
@@ -99,5 +100,15 @@ public class DictionaryServiceImpl implements DictionaryService {
         //创建人信息
         EntityUtil.addCreateInfo(dictionaryEntity);
         dictionaryMapper.insert(dictionaryEntity);
+    }
+
+    @Override
+    public Result queryDictionaryByType(DictionaryDto dictionaryDto) {
+        QueryWrapper<DictionaryEntity> dictionaryEntityQueryWrapper = new QueryWrapper<>();
+        dictionaryEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
+                .eq("dictionary_type",dictionaryDto.getDictionaryType());
+        //查询字典数据
+        List<DictionaryEntity> dictionaryEntityList = dictionaryMapper.selectList(dictionaryEntityQueryWrapper);
+        return Result.success().data("data",dictionaryEntityList);
     }
 }

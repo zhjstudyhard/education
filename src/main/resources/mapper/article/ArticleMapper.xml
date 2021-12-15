@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.article.ArticleMapper">
+    <select id="getArticlePage" resultType="com.education.vo.ArticleVo">
+        select
+        ba.*,
+        bu.username as userName,
+        bd.dictionary_value as typeName
+        from b_article ba
+        left join b_user bu on bu.id = ba.user_id and bu.is_deleted = 0
+        left join b_dictionary bd on bd.dictionary_code = ba.type and bd.is_deleted = 0
+        where ba.is_deleted = 0
+        <if test="title != null and title != ''">
+            and ba.title like concat('%',#{title},'%')
+        </if>
+        order by gmt_create Desc
+    </select>
+</mapper>
