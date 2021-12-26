@@ -15,6 +15,9 @@
         <if test="title != null and title != ''">
             and ba.title like concat('%',#{title},'%')
         </if>
+        <if test="type != null and type != ''">
+            and ba.type = #{type}
+        </if>
         order by gmt_create Desc
     </select>
 </mapper>

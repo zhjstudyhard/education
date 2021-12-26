@@ -36,7 +36,7 @@ public class ArticleServiceImpl implements ArticleService {
     public void addArticle(ArticleDto articleDto) {
         //复制属性
         ArticleEntity articleEntity = new ArticleEntity();
-        BeanUtils.copyProperties(articleDto,articleEntity);
+        BeanUtils.copyProperties(articleDto, articleEntity);
         //添加数据
         UserEntity shiroEntity = ShiroEntityUtil.getShiroEntity();
         articleEntity.setUserId(shiroEntity.getId());
@@ -48,23 +48,48 @@ public class ArticleServiceImpl implements ArticleService {
     public Result getArticlePage(ArticleDto articleDto) {
         PageHelper.startPage(articleDto.getCurrentPage(), articleDto.getPageSize());
         PageInfo<ArticleVo> pageInfo = new PageInfo<>(articleMapper.getArticlePage(articleDto));
-        ResponsePageDto<ArticleVo> articleVoResponsePageDto = new ResponsePageDto<>(pageInfo.getList(), pageInfo.getTotal(), pageInfo.getPageSize(), pageInfo.getPageSize());
-        return Result.success().data("data",articleVoResponsePageDto);
+        ResponsePageDto<ArticleVo> articleVoResponsePageDto = new ResponsePageDto<>(pageInfo.getList(), pageInfo.getTotal(), pageInfo.getPageSize(), pageInfo.getPageNum());
+        return Result.success().data("data", articleVoResponsePageDto);
     }
 
     @Override
     public void deleteArticleById(ArticleDto articleDto) {
         //校验参数
-        if (StringUtils.isBlank(articleDto.getId())){
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不能为空");
+        if (StringUtils.isBlank(articleDto.getId())) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
         }
+        //校验数据
+        ArticleEntity articleEntity = articleMapper.selectById(articleDto.getId());
+        if (articleEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
+        }
+        //更新数据
+        articleEntity.setIsDeleted(Constant.ISDELETED_TRUE);
+        EntityUtil.addModifyInfo(articleEntity);
+
+        articleMapper.updateById(articleEntity);
+    }
+
+    @Override
+    public Result getArticleById(ArticleDto articleDto) {
+        if (StringUtils.isBlank(articleDto.getId())) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "逐渐不能为空");
+        }
+        ArticleEntity articleEntity = articleMapper.selectById(articleDto.getId());
+        if (articleEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
+        }
+        return Result.success().data("data", articleEntity);
+    }
+
+    @Override
+    public void updateArticle(ArticleDto articleDto) {
         //校验数据
         ArticleEntity articleEntity = articleMapper.selectById(articleDto.getId());
         if (articleEntity == null){
             throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
         }
-        //更新数据
-        articleEntity.setIsDeleted(Constant.ISDELETED_TRUE);
+        BeanUtils.copyProperties(articleDto, articleEntity);
         EntityUtil.addModifyInfo(articleEntity);
 
         articleMapper.updateById(articleEntity);

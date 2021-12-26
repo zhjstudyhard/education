@@ -34,8 +34,15 @@ public class LoginController {
 
     @PostMapping("/login")
     public Result userLogin(@RequestBody UserDto userDto, HttpServletResponse response) throws Exception {
-        return userLoginService.login(userDto,response);
+        return userLoginService.login(userDto, response);
     }
+
+    /**
+     * @return com.education.common.Result
+     * @description 用户登出
+     * @author 橘白
+     * @date 2021/12/25 14:29
+     */
 
     @PostMapping("/logout")
     public Result userLogOut() {

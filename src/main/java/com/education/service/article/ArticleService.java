@@ -14,4 +14,8 @@ public interface ArticleService {
     Result getArticlePage(ArticleDto articleDto);
 
     void deleteArticleById(ArticleDto articleDto);
+
+    Result getArticleById(ArticleDto articleDto);
+
+    void updateArticle(ArticleDto articleDto);
 }

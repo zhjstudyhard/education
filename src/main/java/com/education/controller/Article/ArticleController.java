@@ -57,4 +57,32 @@ public class ArticleController {
         articleService.deleteArticleById(articleDto);
         return Result.success();
     }
+
+    /**
+     * @param articleDto
+     * @return com.education.common.Result
+     * @description 根据文章id查询数据
+     * @author 橘白
+     * @date 2021/12/16 16:18
+     */
+
+    @PostMapping("getArticleById")
+    public Result getArticleById(@RequestBody ArticleDto articleDto) {
+        return articleService.getArticleById(articleDto);
+    }
+
+    /**
+     * @param articleDto
+     * @return com.education.common.Result
+     * @description 更新文章
+     * @author 橘白
+     * @date 2021/12/16 19:32
+     */
+
+    @PostMapping("updateArticle")
+    public Result updateArticle(@RequestBody ArticleDto articleDto) {
+        articleService.updateArticle(articleDto);
+        return Result.success();
+    }
+
 }
