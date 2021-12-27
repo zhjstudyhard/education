@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.article.CommentMapper">
+
+    <select id="queryComment" resultType="com.education.vo.CommentVo">
+        select
+        bc.*,
+        bu.username
+        from b_comment bc
+        left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
+        where bc.is_deleted = 0 and bc.article_id = #{articleId}
+        order by bc.gmt_create DESC
+    </select>
+</mapper>

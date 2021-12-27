@@ -1,20 +1,22 @@
-package com.education.entity.article;
-
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.education.entity.base.BaseEntity;
+package com.education.dto.article;
 
 import javax.validation.constraints.NotBlank;
 
 /**
  * @Author: haojie
  * @qq :1422471205
- * @CreateTime: 2021-12-26-19-05
+ * @CreateTime: 2021-12-27-20-26
  */
-@TableName(value = "b_comment")
-public class CommentEntity extends BaseEntity {
+public class CommentDto {
+    private Integer currentPage = 1;
+
+    private Integer pageSize = 10;
+
+    private String id;
     /**
      * 评论内容
      */
+    @NotBlank(message = "评论内容不能为空")
     private String content;
     /**
      * 文章id
@@ -31,11 +33,13 @@ public class CommentEntity extends BaseEntity {
      */
     private String userId;
 
-    /**
-     * 是否博主自己发布的评论（0：否，1：是）
-     */
-    private Integer articleUser;
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getContent() {
         return content;
@@ -69,11 +73,19 @@ public class CommentEntity extends BaseEntity {
         this.userId = userId;
     }
 
-    public Integer getArticleUser() {
-        return articleUser;
+    public Integer getCurrentPage() {
+        return currentPage;
     }
 
-    public void setArticleUser(Integer articleUser) {
-        this.articleUser = articleUser;
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 }
