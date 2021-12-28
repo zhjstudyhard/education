@@ -27,6 +27,11 @@ public class CommentEntity extends BaseEntity {
     private String parentId;
 
     /**
+     * 一级评论id
+     */
+    private String firstParentId;
+
+    /**
      * 发表评论用户id
      */
     private String userId;
@@ -75,5 +80,13 @@ public class CommentEntity extends BaseEntity {
 
     public void setArticleUser(Integer articleUser) {
         this.articleUser = articleUser;
+    }
+
+    public String getFirstParentId() {
+        return firstParentId;
+    }
+
+    public void setFirstParentId(String firstParentId) {
+        this.firstParentId = firstParentId;
     }
 }

@@ -27,6 +27,10 @@ public class CommentDto {
      * 评论父id
      */
     private String parentId;
+    /**
+     * 一级评论的id
+     */
+    private String firstParentId;
 
     /**
      * 发表评论用户id
@@ -87,5 +91,13 @@ public class CommentDto {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public String getFirstParentId() {
+        return firstParentId;
+    }
+
+    public void setFirstParentId(String firstParentId) {
+        this.firstParentId = firstParentId;
     }
 }

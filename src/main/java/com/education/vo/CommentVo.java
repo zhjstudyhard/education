@@ -1,6 +1,8 @@
 package com.education.vo;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: haojie
@@ -29,6 +31,11 @@ public class CommentVo {
     private String userId;
 
     /**
+     * 文章id
+     */
+    private String articleId;
+
+    /**
      * 是否博主自己发布的评论（0：否，1：是）
      */
     private Integer articleUser;
@@ -40,6 +47,20 @@ public class CommentVo {
      * 评论人名称
      */
     private String username;
+
+    /**
+     * 回复人名称
+     */
+    private String applyParentName;
+
+    /**
+     * 评论父id
+     */
+    private String parentId;
+    /**
+     * 子评论
+     */
+    private List<CommentVo> replyComments = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -95,5 +116,37 @@ public class CommentVo {
 
     public void setArticleUser(Integer articleUser) {
         this.articleUser = articleUser;
+    }
+
+    public List<CommentVo> getReplyComments() {
+        return replyComments;
+    }
+
+    public void setReplyComments(List<CommentVo> replyComments) {
+        this.replyComments = replyComments;
+    }
+
+    public String getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(String articleId) {
+        this.articleId = articleId;
+    }
+
+    public String getApplyParentName() {
+        return applyParentName;
+    }
+
+    public void setApplyParentName(String applyParentName) {
+        this.applyParentName = applyParentName;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 }

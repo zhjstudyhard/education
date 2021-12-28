@@ -10,7 +10,24 @@
         bu.username
         from b_comment bc
         left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
-        where bc.is_deleted = 0 and bc.article_id = #{articleId}
+        where bc.is_deleted = 0 and bc.article_id = #{articleId} and bc.parent_id = -1
         order by bc.gmt_create DESC
+    </select>
+    <select id="queryApplyComment" resultType="com.education.vo.CommentVo">
+        select
+        bc.*,
+        bu.username
+        from b_comment bc
+        left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
+        where bc.is_deleted = 0 and bc.article_id = #{articleId}
+        and (bc.parent_id = #{id} or bc.first_parent_id = #{id})
+        order by bc.gmt_create DESC
+    </select>
+    <select id="queryApplyUserComment" resultType="com.education.vo.CommentVo">
+        select
+        bu.username as applyParentName
+        from b_comment bc
+        left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
+        where bc.is_deleted = 0 and bc.id = #{parentId}
     </select>
 </mapper>

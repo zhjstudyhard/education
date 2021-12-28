@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @Author: haojie
  * @qq :1422471205
@@ -79,7 +81,18 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Result queryComment(CommentDto commentDto) {
         PageHelper.startPage(commentDto.getCurrentPage(),commentDto.getPageSize());
-        PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentMapper.queryComment(commentDto));
-        return Result.success().data("data",new ResponsePageDto<>(commentVoPageInfo.getList(),commentVoPageInfo.getTotal(),commentVoPageInfo.getPageSize(),commentVoPageInfo.getPageNum()));
+        List<CommentVo> commentVos = commentMapper.queryComment(commentDto);
+        PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentVos);
+        for (CommentVo commentVo : commentVos){
+             //查询子评论
+            List<CommentVo> applyCommentVos = commentMapper.queryApplyComment(commentVo);
+            //设置子评论回复的父属性
+            for (CommentVo commentVoLocal : applyCommentVos){
+                CommentVo applyUserComment  = commentMapper.queryApplyUserComment(commentVoLocal);
+                commentVoLocal.setApplyParentName(applyUserComment.getApplyParentName());
+            }
+            commentVo.setReplyComments(applyCommentVos);
+        }
+        return Result.success().data("data",new ResponsePageDto<>(commentVos,commentVoPageInfo.getTotal(),commentVoPageInfo.getPageSize(),commentVoPageInfo.getPageNum()));
     }
 }

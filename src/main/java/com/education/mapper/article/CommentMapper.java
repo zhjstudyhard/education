@@ -18,4 +18,8 @@ import java.util.List;
 @Repository
 public interface CommentMapper extends BaseMapper<CommentEntity> {
     List<CommentVo> queryComment(CommentDto commentDto);
+
+    List<CommentVo> queryApplyComment(CommentVo commentVo);
+
+    CommentVo queryApplyUserComment(CommentVo commentVoLocal);
 }
