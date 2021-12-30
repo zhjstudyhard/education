@@ -85,4 +85,18 @@ public class ArticleController {
         return Result.success();
     }
 
+    /**
+     * @description  设置文章周榜
+     * @param articleDto
+     * @return com.education.common.Result
+     * @author 橘白
+     * @date 2021/12/30 17:29
+     */
+
+    @PostMapping("zsetArticle")
+    public Result zsetArticle(@RequestBody ArticleDto articleDto) throws Exception {
+        articleService.zsetArticle();
+        return Result.success();
+    }
+
 }

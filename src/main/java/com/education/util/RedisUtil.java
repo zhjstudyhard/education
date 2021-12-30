@@ -1021,7 +1021,7 @@ public class RedisUtil {
      * @param score
      * @return
      */
-    public Boolean zAdd(String key, String value, double score) {
+    public static Boolean zAdd(String key, String value, double score) {
         return redisTemplate.opsForZSet().add(key, value, score);
     }
 

@@ -7,6 +7,7 @@ import com.education.vo.ArticleVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,4 +19,6 @@ import java.util.List;
 @Repository
 public interface ArticleMapper extends BaseMapper<ArticleEntity> {
     List<ArticleVo> getArticlePage(ArticleDto articleDto);
+
+    List<ArticleVo> queryZsetArticle(Date formatAfterTime, Date formatBeforeTime);
 }

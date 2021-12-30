@@ -14,4 +14,8 @@ public class Constant {
     public final static String SHIRO_REFRESH_TOKEN = "shiro:refresh_token:";
     //标志时间戳
     public final static String CURREN_TIIME_MILLIS = "currentTimeMillis";
+    //redis文章周榜缓存的key
+    public final static String REDIS_ARTICE_KEY = "ARTICE:WEEK:RANK";
+    //redis缓存文章数据
+    public final static String REDIS_ARTICE_CACHE = "ARTICE:CACHE";
 }

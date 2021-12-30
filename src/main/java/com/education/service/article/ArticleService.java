@@ -3,6 +3,8 @@ package com.education.service.article;
 import com.education.common.Result;
 import com.education.dto.article.ArticleDto;
 
+import java.text.ParseException;
+
 /**
  * @Author: haojie
  * @qq :1422471205
@@ -18,4 +20,6 @@ public interface ArticleService {
     Result getArticleById(ArticleDto articleDto);
 
     void updateArticle(ArticleDto articleDto);
+
+    void zsetArticle() throws Exception;
 }

@@ -1,5 +1,6 @@
 package com.education.service.serviceImpl.article;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.Result;
 import com.education.common.ResultCode;
 import com.education.constant.Constant;
@@ -11,6 +12,7 @@ import com.education.exceptionhandler.EducationException;
 import com.education.mapper.article.ArticleMapper;
 import com.education.service.article.ArticleService;
 import com.education.util.EntityUtil;
+import com.education.util.RedisUtil;
 import com.education.util.ShiroEntityUtil;
 import com.education.vo.ArticleVo;
 import com.github.pagehelper.PageHelper;
@@ -20,6 +22,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: haojie
@@ -73,7 +81,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Result getArticleById(ArticleDto articleDto) {
         if (StringUtils.isBlank(articleDto.getId())) {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "逐渐不能为空");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
         }
         ArticleEntity articleEntity = articleMapper.selectById(articleDto.getId());
         if (articleEntity == null) {
@@ -86,12 +94,42 @@ public class ArticleServiceImpl implements ArticleService {
     public void updateArticle(ArticleDto articleDto) {
         //校验数据
         ArticleEntity articleEntity = articleMapper.selectById(articleDto.getId());
-        if (articleEntity == null){
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
+        if (articleEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
         }
         BeanUtils.copyProperties(articleDto, articleEntity);
         EntityUtil.addModifyInfo(articleEntity);
 
         articleMapper.updateById(articleEntity);
+    }
+
+    @Override
+    public void zsetArticle() throws Exception {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        //查询七天内的文章数据
+        Calendar calendar = Calendar.getInstance();
+        //日历设置时间
+        Date nowTime = new Date();
+        calendar.setTime(nowTime);
+        //获取七天前的时间
+        calendar.add(Calendar.DATE, -7);
+        Date queryDate = calendar.getTime();
+        //格式化时间，只是用年月日查询
+        Date formatAfterTime = format.parse(format.format(format));
+        Date formatBeforeTime = format.parse(format.format(nowTime));
+        //查询数据
+        List<ArticleVo> articleVos = articleMapper.queryZsetArticle(formatAfterTime, formatBeforeTime);
+        //1.redis缓存文章，ZSET数据类型，2.设置redis的String缓存文章数据(对象字段过多，且更改不频繁，暂不考虑hash)
+        for (ArticleVo articleVo : articleVos) {
+            RedisUtil.zAdd(Constant.REDIS_ARTICE_KEY, articleVo.getId(), articleVo.getCommentQuality());
+            //缓存文章数据，1.设置文章过期时间，2.缓存数据
+            long expireTime = articleVo.getGmtCreate().getTime() - nowTime.getTime();
+            String articleKey = Constant.REDIS_ARTICE_CACHE + articleVo.getId();
+            this.addArticleCache(articleKey, articleVo, expireTime);
+        }
+    }
+
+    private void addArticleCache(String articleKey, ArticleVo articleVo, Long expireTime) {
+
     }
 }

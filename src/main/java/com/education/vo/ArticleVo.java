@@ -70,6 +70,11 @@ public class ArticleVo {
      */
     private Date gmtModified;
 
+    /**
+     * 文章评论数量
+     */
+    private Integer commentQuality;
+
     public String getId() {
         return id;
     }
@@ -180,5 +185,13 @@ public class ArticleVo {
 
     public void setGmtModified(Date gmtModified) {
         this.gmtModified = gmtModified;
+    }
+
+    public Integer getCommentQuality() {
+        return commentQuality;
+    }
+
+    public void setCommentQuality(Integer commentQuality) {
+        this.commentQuality = commentQuality;
     }
 }

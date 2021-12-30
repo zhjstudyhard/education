@@ -20,4 +20,27 @@
         </if>
         order by gmt_create Desc
     </select>
+    <select id="queryZsetArticle" resultType="com.education.vo.ArticleVo">
+        SELECT
+        ba.*, bu.username AS userName,
+        bd.dictionary_value AS typeName,
+        (
+        SELECT
+        count(*)
+        FROM
+        b_comment
+        WHERE
+        ba.id = b_comment.article_id
+        ) AS commentQuality
+        FROM
+        b_article ba
+        LEFT JOIN b_user bu ON bu.id = ba.user_id
+        AND bu.is_deleted = 0
+        LEFT JOIN b_dictionary bd ON bd.dictionary_code = ba.type
+        AND bd.is_deleted = 0
+        WHERE
+        ba.is_deleted = 0 and date_format(gmt_create,"%Y-%m-%d") >= #{formatAfterTime} and #{formatBeforeTime} >= date_format(gmt_create,"%Y-%m-%d")
+        ORDER BY
+        gmt_create DESC,commentQuality DESC LIMIT 10
+    </select>
 </mapper>
