@@ -22,4 +22,6 @@ public interface ArticleService {
     void updateArticle(ArticleDto articleDto);
 
     void zsetArticle() throws Exception;
+
+    Result queryCacheArticle();
 }

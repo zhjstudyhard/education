@@ -1,5 +1,7 @@
 package com.education.service.serviceImpl.article;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.Result;
 import com.education.common.ResultCode;
@@ -20,14 +22,14 @@ import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: haojie
@@ -83,9 +85,16 @@ public class ArticleServiceImpl implements ArticleService {
         if (StringUtils.isBlank(articleDto.getId())) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
         }
-        ArticleEntity articleEntity = articleMapper.selectById(articleDto.getId());
-        if (articleEntity == null) {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
+        ArticleEntity articleEntity = new ArticleEntity();
+        //查询缓存
+        if (RedisUtil.hasKey(Constant.REDIS_ARTICE_CACHE + articleDto.getId())) {
+            ArticleVo articleVo = JSONObject.parseObject(RedisUtil.get(Constant.REDIS_ARTICE_CACHE + articleDto.getId()), ArticleVo.class);
+            BeanUtils.copyProperties(articleVo, articleEntity);
+        } else {
+            articleEntity = articleMapper.selectById(articleDto.getId());
+            if (articleEntity == null) {
+                throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
+            }
         }
         return Result.success().data("data", articleEntity);
     }
@@ -115,7 +124,7 @@ public class ArticleServiceImpl implements ArticleService {
         calendar.add(Calendar.DATE, -7);
         Date queryDate = calendar.getTime();
         //格式化时间，只是用年月日查询
-        Date formatAfterTime = format.parse(format.format(format));
+        Date formatAfterTime = format.parse(format.format(queryDate));
         Date formatBeforeTime = format.parse(format.format(nowTime));
         //查询数据
         List<ArticleVo> articleVos = articleMapper.queryZsetArticle(formatAfterTime, formatBeforeTime);
@@ -123,13 +132,43 @@ public class ArticleServiceImpl implements ArticleService {
         for (ArticleVo articleVo : articleVos) {
             RedisUtil.zAdd(Constant.REDIS_ARTICE_KEY, articleVo.getId(), articleVo.getCommentQuality());
             //缓存文章数据，1.设置文章过期时间，2.缓存数据
-            long expireTime = articleVo.getGmtCreate().getTime() - nowTime.getTime();
+            long expireTime = formatBeforeTime.getTime() - articleVo.getGmtCreate().getTime();
             String articleKey = Constant.REDIS_ARTICE_CACHE + articleVo.getId();
             this.addArticleCache(articleKey, articleVo, expireTime);
         }
     }
 
     private void addArticleCache(String articleKey, ArticleVo articleVo, Long expireTime) {
+        //把文章数据加入缓存
+        RedisUtil.setEx(articleKey, JSON.toJSONString(articleVo), expireTime / 1000, TimeUnit.SECONDS);
+    }
 
+    @Override
+    public Result queryCacheArticle() {
+        //结果集
+        ArrayList<ArticleVo> list = new ArrayList<>();
+        Set<ZSetOperations.TypedTuple<String>> Articles = RedisUtil.zReverseRangeWithScores(Constant.REDIS_ARTICE_KEY, 0, -1);
+        for (ZSetOperations.TypedTuple article : Articles) {
+            ArticleVo articleVo = new ArticleVo();
+            //缓存查询属性
+            if (RedisUtil.hasKey(Constant.REDIS_ARTICE_CACHE + article.getValue())) {
+                ArticleVo articleVoCache = JSONObject.parseObject(RedisUtil.get(Constant.REDIS_ARTICE_CACHE + article.getValue()), ArticleVo.class);
+                BeanUtils.copyProperties(articleVoCache, articleVo);
+            } else {
+                ArticleEntity articleEntity = articleMapper.selectById(article.getValue().toString());
+                if (null == articleEntity) {
+                    throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
+                }
+                BeanUtils.copyProperties(articleEntity, articleVo);
+            }
+            //属性赋值
+            articleVo.setId(article.getValue().toString());
+            articleVo.setCommentQuality(article.getScore().intValue());
+            list.add(articleVo);
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("data",list);
+        //返回结果集
+        return Result.success().data(map);
     }
 }

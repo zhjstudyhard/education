@@ -39,8 +39,10 @@
         LEFT JOIN b_dictionary bd ON bd.dictionary_code = ba.type
         AND bd.is_deleted = 0
         WHERE
-        ba.is_deleted = 0 and date_format(gmt_create,"%Y-%m-%d") >= #{formatAfterTime} and #{formatBeforeTime} >= date_format(gmt_create,"%Y-%m-%d")
+        ba.is_deleted = 0
+<!--        and date_format(ba.gmt_create,"%Y-%m-%d") >= #{formatAfterTime} and #{formatBeforeTime} >= date_format(ba.gmt_create,"%Y-%m-%d")-->
+        and ba.gmt_create >= #{formatAfterTime} and #{formatBeforeTime} >= ba.gmt_create
         ORDER BY
-        gmt_create DESC,commentQuality DESC LIMIT 10
+        ba.gmt_create DESC,commentQuality DESC LIMIT 10
     </select>
 </mapper>

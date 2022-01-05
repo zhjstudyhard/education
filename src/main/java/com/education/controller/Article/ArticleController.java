@@ -86,9 +86,9 @@ public class ArticleController {
     }
 
     /**
-     * @description  设置文章周榜
      * @param articleDto
      * @return com.education.common.Result
+     * @description 设置文章周榜
      * @author 橘白
      * @date 2021/12/30 17:29
      */
@@ -99,4 +99,15 @@ public class ArticleController {
         return Result.success();
     }
 
+    /**
+     * @return com.education.common.Result
+     * @description 缓存查询
+     * @author 橘白
+     * @date 2022/1/5 19:47
+     */
+
+    @PostMapping("queryCacheArticle")
+    public Result queryCacheArticle() {
+        return articleService.queryCacheArticle();
+    }
 }

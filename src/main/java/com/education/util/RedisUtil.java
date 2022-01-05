@@ -1161,7 +1161,7 @@ public class RedisUtil {
      * @param end
      * @return
      */
-    public Set<TypedTuple<String>> zReverseRangeWithScores(String key,
+    public static Set<TypedTuple<String>> zReverseRangeWithScores(String key,
                                                            long start, long end) {
         return redisTemplate.opsForZSet().reverseRangeWithScores(key, start,
                 end);
