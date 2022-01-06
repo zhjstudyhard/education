@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.system.UserRoleMapper">
+
+    <select id="queryUserRoles" resultType="java.lang.String">
+        SELECT
+        br.role_code
+        FROM
+        b_userrole bur
+        INNER JOIN b_role br ON bur.user_id = br.id AND br.is_deleted = 0
+        WHERE
+        bur.is_deleted = 0 and bur.user_id = #{id}
+    </select>
+</mapper>

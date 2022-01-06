@@ -45,6 +45,17 @@ public class ArticleController {
     }
 
     /**
+     * @return com.education.common.Result
+     * @description 查询所有文章
+     * @author 橘白
+     * @date 2022/1/6 20:42
+     */
+    @PostMapping("getAllArticle")
+    public Result getAllArticle() {
+        return articleService.getAllArticle();
+    }
+
+    /**
      * @param articleDto
      * @return com.education.common.Result
      * @description 根据id删除文章

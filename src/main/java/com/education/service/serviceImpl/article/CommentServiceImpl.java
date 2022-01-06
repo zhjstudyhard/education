@@ -2,6 +2,7 @@ package com.education.service.serviceImpl.article;
 
 import com.education.common.Result;
 import com.education.common.ResultCode;
+import com.education.constant.Constant;
 import com.education.dto.article.CommentDto;
 import com.education.dto.base.ResponsePageDto;
 import com.education.entity.article.ArticleEntity;
@@ -75,6 +76,8 @@ public class CommentServiceImpl implements CommentService {
 
         //属性赋值
         EntityUtil.addModifyInfo(commentEntity);
+        commentEntity.setIsDeleted(Constant.ISDELETED_TRUE);
+
         commentMapper.updateById(commentEntity);
     }
 
@@ -94,5 +97,12 @@ public class CommentServiceImpl implements CommentService {
             commentVo.setReplyComments(applyCommentVos);
         }
         return Result.success().data("data",new ResponsePageDto<>(commentVos,commentVoPageInfo.getTotal(),commentVoPageInfo.getPageSize(),commentVoPageInfo.getPageNum()));
+    }
+
+    @Override
+    public Result queryAllComment(CommentDto commentDto) {
+        PageHelper.startPage(commentDto.getCurrentPage(),commentDto.getPageSize());
+        PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentMapper.queryAllComment(commentDto));
+        return Result.success().data("data",new ResponsePageDto<>(commentVoPageInfo.getList(),commentVoPageInfo.getTotal(),commentVoPageInfo.getPageSize(),commentVoPageInfo.getPageNum()));
     }
 }

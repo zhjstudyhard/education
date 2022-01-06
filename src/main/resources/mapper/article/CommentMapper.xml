@@ -30,4 +30,18 @@
         left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
         where bc.is_deleted = 0 and bc.id = #{parentId}
     </select>
+    <select id="queryAllComment" resultType="com.education.vo.CommentVo">
+        select
+        bc.*,
+        bu.username,
+        ba.title as title
+        from b_comment bc
+        left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
+        left join b_article ba on ba.id = bc.article_id and ba.is_deleted = 0
+        where bc.is_deleted = 0
+        <if test="articleId != null and articleId != ''">
+            and bc.article_id = #{articleId}
+        </if>
+        order by bc.gmt_create DESC
+    </select>
 </mapper>

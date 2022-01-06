@@ -73,6 +73,7 @@ public class ArticleDto {
      */
     private Integer status;
 
+
     public String getTitle() {
         return title;
     }

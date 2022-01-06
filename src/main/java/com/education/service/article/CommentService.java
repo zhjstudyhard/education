@@ -14,4 +14,6 @@ public interface CommentService {
     void delComment(CommentDto commentDto);
 
     Result queryComment(CommentDto commentDto);
+
+    Result queryAllComment(CommentDto commentDto);
 }

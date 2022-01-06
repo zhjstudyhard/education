@@ -2,7 +2,6 @@ package com.education.service.serviceImpl.article;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.Result;
 import com.education.common.ResultCode;
 import com.education.constant.Constant;
@@ -20,16 +19,21 @@ import com.education.vo.ArticleVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
+import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @Author: haojie
@@ -39,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ArticleServiceImpl implements ArticleService {
+    private static final Logger logger = LogManager.getLogger();
+
     @Autowired
     private ArticleMapper articleMapper;
 
@@ -56,7 +62,43 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Result getArticlePage(ArticleDto articleDto) {
+        Subject subject = SecurityUtils.getSubject();
+        UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
+        //判断角色(太麻烦，还不如直接查数据库进行判断)
+        boolean[] booleans = subject.hasRoles(Arrays.asList("admin", "manager"));
+        Boolean flag = true;
+        for (int i = 0; i < booleans.length; i++){
+            if (booleans[i] == true){
+                flag = false;
+                break;
+            }
+        }
+        if (flag){
+            articleDto.setUserId(userEntity.getId());
+        }
         PageHelper.startPage(articleDto.getCurrentPage(), articleDto.getPageSize());
+        PageInfo<ArticleVo> pageInfo = new PageInfo<>(articleMapper.getArticlePage(articleDto));
+        ResponsePageDto<ArticleVo> articleVoResponsePageDto = new ResponsePageDto<>(pageInfo.getList(), pageInfo.getTotal(), pageInfo.getPageSize(), pageInfo.getPageNum());
+        return Result.success().data("data", articleVoResponsePageDto);
+    }
+
+    @Override
+    public Result getAllArticle() {
+        Subject subject = SecurityUtils.getSubject();
+        UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
+        ArticleDto articleDto = new ArticleDto();
+        //判断角色(太麻烦，还不如直接查数据库进行判断)
+        boolean[] booleans = subject.hasRoles(Arrays.asList("admin", "manager"));
+        Boolean flag = true;
+        for (int i = 0; i < booleans.length; i++){
+            if (booleans[i] == true){
+                flag = false;
+                break;
+            }
+        }
+        if (flag){
+            articleDto.setUserId(userEntity.getId());
+        }
         PageInfo<ArticleVo> pageInfo = new PageInfo<>(articleMapper.getArticlePage(articleDto));
         ResponsePageDto<ArticleVo> articleVoResponsePageDto = new ResponsePageDto<>(pageInfo.getList(), pageInfo.getTotal(), pageInfo.getPageSize(), pageInfo.getPageNum());
         return Result.success().data("data", articleVoResponsePageDto);
@@ -129,6 +171,19 @@ public class ArticleServiceImpl implements ArticleService {
         //查询数据
         List<ArticleVo> articleVos = articleMapper.queryZsetArticle(formatAfterTime, formatBeforeTime);
         //1.redis缓存文章，ZSET数据类型，2.设置redis的String缓存文章数据(对象字段过多，且更改不频繁，暂不考虑hash)
+
+        //删除缓存(由于数据量不大使用keys命令，可以改成scan非阻塞IO,因为懒不想太麻烦)
+        Set<String> keys = RedisUtil.keys(Constant.REDIS_ARTICE_CACHE + "*");
+        List<String> keysList = keys.stream().collect(Collectors.toList());
+        //删除文章热议缓存
+        Set<ZSetOperations.TypedTuple<String>> weekRankData = RedisUtil.zReverseRangeWithScores(Constant.REDIS_ARTICE_KEY, 0, -1);
+        if (keysList != null && keysList.size() > 0) {
+            if (weekRankData != null && weekRankData.size() > 0) {
+                keysList.add(Constant.REDIS_ARTICE_KEY);
+            }
+            RedisUtil.delete(keysList);
+        }
+        //添加缓存
         for (ArticleVo articleVo : articleVos) {
             RedisUtil.zAdd(Constant.REDIS_ARTICE_KEY, articleVo.getId(), articleVo.getCommentQuality());
             //缓存文章数据，1.设置文章过期时间，2.缓存数据
@@ -167,7 +222,7 @@ public class ArticleServiceImpl implements ArticleService {
             list.add(articleVo);
         }
         HashMap<String, Object> map = new HashMap<>();
-        map.put("data",list);
+        map.put("data", list);
         //返回结果集
         return Result.success().data(map);
     }

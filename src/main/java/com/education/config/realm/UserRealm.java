@@ -6,9 +6,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.constant.Constant;
 import com.education.entity.system.UserEntity;
 import com.education.mapper.system.UserMapper;
-import com.education.service.system.UserService;
+import com.education.mapper.system.UserRoleMapper;
 import com.education.util.JWTUntils;
 import com.education.util.RedisUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -17,7 +20,11 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
 
 /**
  * @Author: haojie
@@ -25,9 +32,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @CreateTime: 2021-02-04-13-25
  */
 public class UserRealm extends AuthorizingRealm {
+    private static final Logger logger =  LogManager.getLogger();
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserRoleMapper userRoleMapper;
 
     @Override
     public boolean supports(AuthenticationToken token) {
@@ -36,15 +47,16 @@ public class UserRealm extends AuthorizingRealm {
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-//        //获取登录验证的参数是什么,principalCollection就是什么
-//        String token = (String)principalCollection.getPrimaryPrincipal();
-//        System.out.println("principalCollection: "+token);
-//        //获取当前用户的用户名
-//        String userName = JWTuntils.getUserName(token);
-//        //获取当前用户的角色信息
-//        userVO roles = userService.getRoles(userName);
-//        System.out.println("roles: "+roles);
-//        SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
+        logger.info("进入doGetAuthorizationInfo授权。。。。。。");
+        //获取登录验证的参数是什么,principalCollection就是什么
+        UserEntity userEntity = (UserEntity)principalCollection.getPrimaryPrincipal();
+        //返回授权信息
+        SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
+        //获取当前用户的角色信息
+        List<String> roles =  userRoleMapper.queryUserRoles(userEntity);
+        if (roles != null && roles.size() > 0){
+            simpleAuthorizationInfo.addRoles(roles);
+        }
 //        //添加角色信息
 //        for (Role role : roles.getRoles()){
 //            simpleAuthorizationInfo.addRole(role.getRoleName());
@@ -53,14 +65,13 @@ public class UserRealm extends AuthorizingRealm {
 //                simpleAuthorizationInfo.addStringPermission(permission.getSn());
 //            }
 //        }
-//        return simpleAuthorizationInfo;
-        return null;
+        return simpleAuthorizationInfo;
     }
 
     //用户密码验证
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        System.out.println("认证~~~~~~~");
+        logger.info("进入doGetAuthenticationInfo认证。。。。。。");
         String token = (String) authenticationToken.getCredentials();
         String username = null;
         try {

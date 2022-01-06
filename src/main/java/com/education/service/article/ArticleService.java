@@ -24,4 +24,6 @@ public interface ArticleService {
     void zsetArticle() throws Exception;
 
     Result queryCacheArticle();
+
+    Result getAllArticle();
 }

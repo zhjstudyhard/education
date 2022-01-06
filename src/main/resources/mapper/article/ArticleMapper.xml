@@ -12,6 +12,9 @@
         left join b_user bu on bu.id = ba.user_id and bu.is_deleted = 0
         left join b_dictionary bd on bd.dictionary_code = ba.type and bd.is_deleted = 0
         where ba.is_deleted = 0
+        <if test="userId != null and userId != ''">
+            and user_id = #{userId}
+        </if>
         <if test="title != null and title != ''">
             and ba.title like concat('%',#{title},'%')
         </if>

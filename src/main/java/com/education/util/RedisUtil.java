@@ -55,7 +55,7 @@ public class RedisUtil {
      *
      * @param keys
      */
-    public void delete(Collection<String> keys) {
+    public static void delete(Collection<String> keys) {
         redisTemplate.delete(keys);
     }
 
@@ -108,7 +108,7 @@ public class RedisUtil {
      * @param pattern
      * @return
      */
-    public Set<String> keys(String pattern) {
+    public static Set<String> keys(String pattern) {
         return redisTemplate.keys(pattern);
     }
 
