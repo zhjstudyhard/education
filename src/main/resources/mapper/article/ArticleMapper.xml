@@ -48,4 +48,21 @@
         ORDER BY
         ba.gmt_create DESC,commentQuality DESC LIMIT 10
     </select>
+    <select id="getFontArticlePage" resultType="com.education.vo.ArticleVo">
+        select
+        ba.*,
+        bu.username as userName,
+        bd.dictionary_value as typeName
+        from b_article ba
+        left join b_user bu on bu.id = ba.user_id and bu.is_deleted = 0
+        left join b_dictionary bd on bd.dictionary_code = ba.type and bd.is_deleted = 0
+        where ba.is_deleted = 0 and ba.status = 1
+        <if test="title != null and title != ''">
+            and ba.title like concat('%',#{title},'%')
+        </if>
+        <if test="type != null and type != ''">
+            and ba.type = #{type}
+        </if>
+        order by gmt_create Desc
+    </select>
 </mapper>

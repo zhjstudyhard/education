@@ -83,6 +83,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public Result getFontArticlePage(ArticleDto articleDto) {
+        PageHelper.startPage(articleDto.getCurrentPage(), articleDto.getPageSize());
+        PageInfo<ArticleVo> pageInfo = new PageInfo<>(articleMapper.getFontArticlePage(articleDto));
+        ResponsePageDto<ArticleVo> articleVoResponsePageDto = new ResponsePageDto<>(pageInfo.getList(), pageInfo.getTotal(), pageInfo.getPageSize(), pageInfo.getPageNum());
+        return Result.success().data("data", articleVoResponsePageDto);
+    }
+
+    @Override
     public Result getAllArticle() {
         Subject subject = SecurityUtils.getSubject();
         UserEntity userEntity = ShiroEntityUtil.getShiroEntity();

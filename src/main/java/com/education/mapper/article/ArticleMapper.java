@@ -21,4 +21,6 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
     List<ArticleVo> getArticlePage(ArticleDto articleDto);
 
     List<ArticleVo> queryZsetArticle(Date formatAfterTime, Date formatBeforeTime);
+
+    List<ArticleVo> getFontArticlePage(ArticleDto articleDto);
 }

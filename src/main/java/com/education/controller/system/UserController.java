@@ -1,6 +1,7 @@
 package com.education.controller.system;
 
 import com.education.common.Result;
+import com.education.dto.system.PasswordDto;
 import com.education.dto.system.UserDto;
 import com.education.service.system.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,12 @@ public class UserController {
     @PostMapping("/addUser")
     public Object addUser(@Validated @RequestBody UserDto userDto){
         userService.addUser(userDto);
+        return Result.success();
+    }
+
+    @PostMapping("/updatePassword")
+    public Object updatePassword(@Validated @RequestBody PasswordDto passwordDto) throws Exception {
+        userService.updatePassword(passwordDto);
         return Result.success();
     }
 }

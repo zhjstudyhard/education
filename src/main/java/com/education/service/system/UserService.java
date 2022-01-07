@@ -1,6 +1,7 @@
 package com.education.service.system;
 
 import com.education.common.Result;
+import com.education.dto.system.PasswordDto;
 import com.education.dto.system.RoleDto;
 import com.education.dto.system.UserDto;
 
@@ -18,4 +19,6 @@ public interface UserService {
     void editUser(UserDto userDto);
 
     void addUser(UserDto userDto);
+
+    void updatePassword(PasswordDto passwordDto) throws Exception;
 }

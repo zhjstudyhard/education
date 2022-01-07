@@ -26,4 +26,6 @@ public interface ArticleService {
     Result queryCacheArticle();
 
     Result getAllArticle();
+
+    Result getFontArticlePage(ArticleDto articleDto);
 }

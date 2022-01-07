@@ -45,6 +45,19 @@ public class ArticleController {
     }
 
     /**
+     * @param articleDto
+     * @return com.education.common.Result
+     * @description 前台查询数据
+     * @author 橘白
+     * @date 2022/1/7 16:43
+     */
+
+    @PostMapping("getFontArticlePage")
+    public Result getFontArticlePage(@RequestBody ArticleDto articleDto) {
+        return articleService.getFontArticlePage(articleDto);
+    }
+
+    /**
      * @return com.education.common.Result
      * @description 查询所有文章
      * @author 橘白

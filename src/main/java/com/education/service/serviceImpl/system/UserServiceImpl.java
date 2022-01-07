@@ -3,9 +3,11 @@ package com.education.service.serviceImpl.system;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.Result;
 import com.education.common.ResultCode;
+import com.education.config.SecurityBean;
 import com.education.constant.Constant;
 import com.education.dto.base.ResponsePageDto;
 import com.education.dto.system.DictionaryDto;
+import com.education.dto.system.PasswordDto;
 import com.education.dto.system.UserDto;
 import com.education.entity.system.DictionaryEntity;
 import com.education.entity.system.UserEntity;
@@ -17,6 +19,9 @@ import com.education.mapper.system.UserRoleMapper;
 import com.education.service.system.DictionaryService;
 import com.education.service.system.UserService;
 import com.education.util.EntityUtil;
+import com.education.util.MD5Util;
+import com.education.util.RSAUtil;
+import com.education.util.ShiroEntityUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
@@ -24,7 +29,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.security.util.Password;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 
 /**
@@ -130,5 +137,21 @@ public class UserServiceImpl implements UserService {
         //创建人信息
         EntityUtil.addCreateInfo(userRoleEntity);
         userRoleMapper.insert(userRoleEntity);
+    }
+
+    @Override
+    public void updatePassword(PasswordDto passwordDto) throws Exception{
+        UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
+
+        String oldPassword = RSAUtil.decrypt(passwordDto.getOldPassword(), SecurityBean.encryptRSAKey);
+        if (!MD5Util.encrypt(oldPassword).equals(userEntity.getPassword())){
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"旧密码错误");
+        }
+        EntityUtil.addModifyInfo(userEntity);
+        //设置密码
+        String newPassword = RSAUtil.decrypt(passwordDto.getNewPassword(), SecurityBean.encryptRSAKey);
+        userEntity.setPassword(MD5Util.encrypt(newPassword));
+        //更改数据
+        userMapper.updateById(userEntity);
     }
 }

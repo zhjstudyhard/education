@@ -12,6 +12,7 @@ import com.education.mapper.system.*;
 import com.education.service.system.PermissionService;
 import com.education.util.EntityUtil;
 import com.education.vo.PermissionVo;
+import com.education.vo.UserVo;
 import com.sun.javafx.tk.PermissionHelper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -563,7 +564,11 @@ public class PermissionServiceImpl implements PermissionService {
 //        }
 //        redisTemplate.opsForValue().set(username, permissionValueList);
 
-        result.put("username", userEntity.getUsername());
+//        result.put("username", userEntity.getUsername());
+        UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(userEntity,userVo);
+
+        result.put("user", userVo);
         result.put("avatar", "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif");
         result.put("roles", roleCodedList);
         result.put("permissionValueList", permissionValueList);
