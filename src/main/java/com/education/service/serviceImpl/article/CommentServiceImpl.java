@@ -2,17 +2,23 @@ package com.education.service.serviceImpl.article;
 
 import com.education.common.Result;
 import com.education.common.ResultCode;
+import com.education.config.GlobalData;
 import com.education.constant.Constant;
+import com.education.dto.article.ArticleDto;
 import com.education.dto.article.CommentDto;
 import com.education.dto.base.ResponsePageDto;
 import com.education.entity.article.ArticleEntity;
 import com.education.entity.article.CommentEntity;
+import com.education.entity.article.MessageEntity;
+import com.education.entity.system.DictionaryEntity;
 import com.education.entity.system.UserEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.article.ArticleMapper;
 import com.education.mapper.article.CommentMapper;
+import com.education.mapper.article.MessageMapper;
 import com.education.service.article.CommentService;
 import com.education.util.EntityUtil;
+import com.education.util.ShiroEntityUtil;
 import com.education.vo.CommentVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -24,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,38 +47,75 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private ArticleMapper articleMapper;
 
+    @Autowired
+    private MessageMapper messageMapper;
+
     @Override
     public void addComment(CommentDto commentDto) {
         Subject subject = SecurityUtils.getSubject();
         UserEntity userEntity = (UserEntity) subject.getPrincipal();
         //属性赋值
         CommentEntity commentEntity = new CommentEntity();
-        BeanUtils.copyProperties(commentDto, commentEntity,new String[]{"id"});
+        BeanUtils.copyProperties(commentDto, commentEntity, new String[]{"id"});
         commentEntity.setUserId(userEntity.getId());
         EntityUtil.addCreateInfo(commentEntity);
         //判断是否博主自己评论
         ArticleEntity articleEntity = articleMapper.selectById(commentDto.getArticleId());
-        if (articleEntity == null){
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"文章数据不存在");
+        if (articleEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "文章数据不存在");
         }
 
-        if (articleEntity.getUserId().equals(userEntity.getId())){
+        if (articleEntity.getUserId().equals(userEntity.getId())) {
             commentEntity.setArticleUser(1);
-        }else {
+        } else {
             commentEntity.setArticleUser(0);
         }
         //添加
         commentMapper.insert(commentEntity);
+
+        //添加消息通知
+        addMessage(commentEntity, articleEntity,commentDto.getTargetType());
+    }
+
+    public void addMessage(CommentEntity commentEntity, ArticleEntity articleEntity,Integer targetType) {
+        //初始化属性值
+        MessageEntity messageEntity = new MessageEntity();
+        EntityUtil.addCreateInfo(messageEntity);
+        messageEntity.setTargetId(articleEntity.getId());
+        messageEntity.setTargetType(targetType);
+        messageEntity.setFromUserId(commentEntity.getUserId());
+        messageEntity.setContent(commentEntity.getContent());
+        //判断消息类型
+        if (StringUtils.isNotBlank(commentEntity.getParentId()) && commentEntity.getParentId().equals(Constant.NUMBER_NEGATIVE_ONE)){
+
+            messageEntity.setToUserId(articleEntity.getUserId());
+            DictionaryEntity dictionaryEntity = GlobalData.dictMap.get(Constant.MESSAGE_COMMENT);
+            if (dictionaryEntity != null){
+                messageEntity.setType(dictionaryEntity.getDictionaryCode());
+            }
+        }else {
+            DictionaryEntity dictionaryEntity = GlobalData.dictMap.get(Constant.MESSAGE_MESSAGE_ANSWER);
+            if (dictionaryEntity != null){
+                messageEntity.setType(dictionaryEntity.getDictionaryCode());
+            }
+            CommentEntity parentCommentEntity = commentMapper.selectById(commentEntity.getParentId());
+            if (parentCommentEntity == null){
+                throw new EducationException(ResultCode.FAILER_CODE.getCode(),"父评论不存在");
+            }
+            messageEntity.setToUserId(parentCommentEntity.getUserId());
+        }
+
+        messageMapper.insert(messageEntity);
     }
 
     @Override
     public void delComment(CommentDto commentDto) {
-        if (StringUtils.isBlank(commentDto.getId())){
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不能为空");
+        if (StringUtils.isBlank(commentDto.getId())) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
         }
         CommentEntity commentEntity = commentMapper.selectById(commentDto.getId());
         if (commentEntity == null) {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
         }
 
         //属性赋值
@@ -83,26 +127,32 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Result queryComment(CommentDto commentDto) {
-        PageHelper.startPage(commentDto.getCurrentPage(),commentDto.getPageSize());
+        PageHelper.startPage(commentDto.getCurrentPage(), commentDto.getPageSize());
         List<CommentVo> commentVos = commentMapper.queryComment(commentDto);
         PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentVos);
-        for (CommentVo commentVo : commentVos){
-             //查询子评论
+        for (CommentVo commentVo : commentVos) {
+            //查询子评论
             List<CommentVo> applyCommentVos = commentMapper.queryApplyComment(commentVo);
             //设置子评论回复的父属性
-            for (CommentVo commentVoLocal : applyCommentVos){
-                CommentVo applyUserComment  = commentMapper.queryApplyUserComment(commentVoLocal);
+            for (CommentVo commentVoLocal : applyCommentVos) {
+                CommentVo applyUserComment = commentMapper.queryApplyUserComment(commentVoLocal);
                 commentVoLocal.setApplyParentName(applyUserComment.getApplyParentName());
             }
             commentVo.setReplyComments(applyCommentVos);
         }
-        return Result.success().data("data",new ResponsePageDto<>(commentVos,commentVoPageInfo.getTotal(),commentVoPageInfo.getPageSize(),commentVoPageInfo.getPageNum()));
+        return Result.success().data("data", new ResponsePageDto<>(commentVos, commentVoPageInfo.getTotal(), commentVoPageInfo.getPageSize(), commentVoPageInfo.getPageNum()));
     }
 
     @Override
     public Result queryAllComment(CommentDto commentDto) {
-        PageHelper.startPage(commentDto.getCurrentPage(),commentDto.getPageSize());
+        UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
+        Boolean flag = ShiroEntityUtil.checkPermission();
+        if (flag) {
+            commentDto.setUserId(userEntity.getId());
+        }
+        PageHelper.startPage(commentDto.getCurrentPage(), commentDto.getPageSize());
         PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentMapper.queryAllComment(commentDto));
-        return Result.success().data("data",new ResponsePageDto<>(commentVoPageInfo.getList(),commentVoPageInfo.getTotal(),commentVoPageInfo.getPageSize(),commentVoPageInfo.getPageNum()));
+        return Result.success().data("data", new ResponsePageDto<>(commentVoPageInfo.getList(), commentVoPageInfo.getTotal(), commentVoPageInfo.getPageSize(), commentVoPageInfo.getPageNum()));
     }
+
 }

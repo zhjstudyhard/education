@@ -39,6 +39,9 @@
         left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
         left join b_article ba on ba.id = bc.article_id and ba.is_deleted = 0
         where bc.is_deleted = 0
+        <if test="userId != null and userId != ''">
+            and bc.user_id = #{userId}
+        </if>
         <if test="articleId != null and articleId != ''">
             and bc.article_id = #{articleId}
         </if>

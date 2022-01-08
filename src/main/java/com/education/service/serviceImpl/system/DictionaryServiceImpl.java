@@ -3,6 +3,7 @@ package com.education.service.serviceImpl.system;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.Result;
 import com.education.common.ResultCode;
+import com.education.config.GlobalData;
 import com.education.constant.Constant;
 import com.education.dto.base.ResponsePageDto;
 import com.education.dto.system.DictionaryDto;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: haojie
@@ -46,32 +48,34 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public void deleteDictionary(DictionaryDto dictionaryDto) {
-      if (StringUtils.isBlank(dictionaryDto.getId())){
-          throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不能为空");
-      }
+        if (StringUtils.isBlank(dictionaryDto.getId())) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
+        }
         DictionaryEntity dictionaryEntity = dictionaryMapper.selectById(dictionaryDto.getId());
-      if (dictionaryEntity == null) {
-          throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
-      }
-      dictionaryEntity.setIsDeleted(1);
+        if (dictionaryEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
+        }
+        dictionaryEntity.setIsDeleted(1);
         //更新数据人信息
-      EntityUtil.addModifyInfo(dictionaryEntity);
-      dictionaryMapper.updateById(dictionaryEntity);
+        EntityUtil.addModifyInfo(dictionaryEntity);
+        dictionaryMapper.updateById(dictionaryEntity);
+        //加载数据字典
+        this.globalDictData();
     }
 
     @Override
     public void editDictionary(DictionaryDto dictionaryDto) {
-        if (StringUtils.isBlank(dictionaryDto.getId())){
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不能为空");
+        if (StringUtils.isBlank(dictionaryDto.getId())) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
         }
         //校验字典编码是否重复
         QueryWrapper<DictionaryEntity> dictionaryEntityQueryWrapper = new QueryWrapper<>();
-        dictionaryEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
-                .eq("dictionary_code",dictionaryDto.getDictionaryCode());
+        dictionaryEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
+                .eq("dictionary_code", dictionaryDto.getDictionaryCode());
         DictionaryEntity dictionaryEntity = dictionaryMapper.selectOne(dictionaryEntityQueryWrapper);
         if (dictionaryEntity != null) {
-            if (!dictionaryEntity.getId().equals(dictionaryDto.getId())){
-                throw new EducationException(ResultCode.FAILER_CODE.getCode(),"字典编码重复");
+            if (!dictionaryEntity.getId().equals(dictionaryDto.getId())) {
+                throw new EducationException(ResultCode.FAILER_CODE.getCode(), "字典编码重复");
             }
         }
         DictionaryEntity dictionaryEntityLocal = dictionaryMapper.selectById(dictionaryDto.getId());
@@ -82,17 +86,20 @@ public class DictionaryServiceImpl implements DictionaryService {
         //更新数据人信息
         EntityUtil.addModifyInfo(dictionaryEntityLocal);
         dictionaryMapper.updateById(dictionaryEntityLocal);
+
+        //加载数据字典
+        this.globalDictData();
     }
 
     @Override
     public void addDictionary(DictionaryDto dictionaryDto) {
         //校验字典编码是否重复
         QueryWrapper<DictionaryEntity> dictionaryEntityQueryWrapper = new QueryWrapper<>();
-        dictionaryEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
-                .eq("dictionary_code",dictionaryDto.getDictionaryCode());
+        dictionaryEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
+                .eq("dictionary_code", dictionaryDto.getDictionaryCode());
         DictionaryEntity dictionaryEntityLocal = dictionaryMapper.selectOne(dictionaryEntityQueryWrapper);
         if (dictionaryEntityLocal != null) {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"字典编码重复");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "字典编码重复");
         }
         //copy数据
         DictionaryEntity dictionaryEntity = new DictionaryEntity();
@@ -100,15 +107,41 @@ public class DictionaryServiceImpl implements DictionaryService {
         //创建人信息
         EntityUtil.addCreateInfo(dictionaryEntity);
         dictionaryMapper.insert(dictionaryEntity);
+
+        //加载数据字典
+        this.globalDictData();
     }
 
     @Override
     public Result queryDictionaryByType(DictionaryDto dictionaryDto) {
         QueryWrapper<DictionaryEntity> dictionaryEntityQueryWrapper = new QueryWrapper<>();
-        dictionaryEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
-                .eq("dictionary_type",dictionaryDto.getDictionaryType());
+        dictionaryEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
+                .eq("dictionary_type", dictionaryDto.getDictionaryType());
         //查询字典数据
         List<DictionaryEntity> dictionaryEntityList = dictionaryMapper.selectList(dictionaryEntityQueryWrapper);
-        return Result.success().data("data",dictionaryEntityList);
+        return Result.success().data("data", dictionaryEntityList);
+    }
+
+    /**
+     * @return java.util.Map<java.lang.String, com.education.entity.system.DictionaryEntity>
+     * @description 加载数据字典信息
+     * @author 橘白
+     * @date 2022/1/8 17:57
+     */
+
+    @Override
+    public void globalDictData() {
+        //查询结果集
+        Map<String, DictionaryEntity> resultMap = new HashMap<>();
+        QueryWrapper<DictionaryEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE);
+        //查询字典数据
+        List<DictionaryEntity> dictionaryEntityList = dictionaryMapper.selectList(queryWrapper);
+        if (dictionaryEntityList != null && dictionaryEntityList.size() > 0) {
+            for (DictionaryEntity dictionaryEntity : dictionaryEntityList) {
+                resultMap.put(dictionaryEntity.getDictionaryCode(), dictionaryEntity);
+            }
+        }
+        GlobalData.dictMap = resultMap;
     }
 }

@@ -62,17 +62,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Result getArticlePage(ArticleDto articleDto) {
-        Subject subject = SecurityUtils.getSubject();
         UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
-        //判断角色(太麻烦，还不如直接查数据库进行判断)
-        boolean[] booleans = subject.hasRoles(Arrays.asList("admin", "manager"));
-        Boolean flag = true;
-        for (int i = 0; i < booleans.length; i++){
-            if (booleans[i] == true){
-                flag = false;
-                break;
-            }
-        }
+
+        Boolean flag = ShiroEntityUtil.checkPermission();
         if (flag){
             articleDto.setUserId(userEntity.getId());
         }
@@ -92,21 +84,14 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Result getAllArticle() {
-        Subject subject = SecurityUtils.getSubject();
         UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
+        Boolean flag = ShiroEntityUtil.checkPermission();
+
         ArticleDto articleDto = new ArticleDto();
-        //判断角色(太麻烦，还不如直接查数据库进行判断)
-        boolean[] booleans = subject.hasRoles(Arrays.asList("admin", "manager"));
-        Boolean flag = true;
-        for (int i = 0; i < booleans.length; i++){
-            if (booleans[i] == true){
-                flag = false;
-                break;
-            }
-        }
         if (flag){
             articleDto.setUserId(userEntity.getId());
         }
+
         PageInfo<ArticleVo> pageInfo = new PageInfo<>(articleMapper.getArticlePage(articleDto));
         ResponsePageDto<ArticleVo> articleVoResponsePageDto = new ResponsePageDto<>(pageInfo.getList(), pageInfo.getTotal(), pageInfo.getPageSize(), pageInfo.getPageNum());
         return Result.success().data("data", articleVoResponsePageDto);

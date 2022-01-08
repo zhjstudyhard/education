@@ -6,6 +6,7 @@ import com.education.dto.system.DictionaryDto;
 import com.education.entity.system.DictionaryEntity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: haojie
@@ -28,4 +29,6 @@ public interface DictionaryService {
     void addDictionary(DictionaryDto dictionaryDto);
 
     Result queryDictionaryByType(DictionaryDto dictionaryDto);
+
+    void globalDictData();
 }

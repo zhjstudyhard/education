@@ -1,6 +1,8 @@
 package com.education.dto.article;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @Author: haojie
@@ -36,6 +38,12 @@ public class CommentDto {
      * 发表评论用户id
      */
     private String userId;
+
+    /**
+     * 关联的类型（0:文章，1:视频）
+     */
+    @NotNull(message = "关联类型不能为空")
+    private Integer targetType;
 
     public String getId() {
         return id;
@@ -99,5 +107,13 @@ public class CommentDto {
 
     public void setFirstParentId(String firstParentId) {
         this.firstParentId = firstParentId;
+    }
+
+    public Integer getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(Integer targetType) {
+        this.targetType = targetType;
     }
 }

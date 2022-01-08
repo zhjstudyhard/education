@@ -10,6 +10,8 @@ public class Constant {
     public static final int ISDELETED_FALSE = 0;
     //已删除
     public static final int ISDELETED_TRUE = 1;
+    //-1
+    public static final String NUMBER_NEGATIVE_ONE = "-1";
     //刷新令牌redis的key
     public final static String SHIRO_REFRESH_TOKEN = "shiro:refresh_token:";
     //标志时间戳
@@ -18,4 +20,11 @@ public class Constant {
     public final static String REDIS_ARTICE_KEY = "ARTICE:WEEK:RANK";
     //redis缓存文章数据
     public final static String REDIS_ARTICE_CACHE = "ARTICE:CACHE";
+    //评论回答通知
+    public final static String MESSAGE_MESSAGE_ANSWER = "MESSAGE_MESSAGE_ANSWER";
+    //评论通知
+    public final static String MESSAGE_COMMENT = "MESSAGE_COMMENT";
+    //系统通知
+    public final static String MESSAGE_SYSTEM = "MESSAGE_SYSTEM";
+
 }
