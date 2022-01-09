@@ -1,12 +1,10 @@
 package com.education.controller.Article;
 
 import com.education.common.Result;
+import com.education.dto.article.MessageDto;
 import com.education.service.article.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author: haojie
@@ -31,5 +29,19 @@ public class MessageController {
     public Result queryMessageCount() {
         return messageService.queryMessageCount();
     }
+
+    /**
+     * @param messageDto
+     * @return com.education.common.Result
+     * @description 消息通知分页查询
+     * @author 橘白
+     * @date 2022/1/9 20:04
+     */
+
+    @PostMapping("/queryMessagePage")
+    public Result queryMessagePage(@RequestBody MessageDto messageDto) {
+        return messageService.queryMessagePage(messageDto);
+    }
+
 
 }

@@ -19,6 +19,7 @@ public class MessageEntity extends BaseEntity {
      * 消息接收人id
      */
     private String toUserId;
+
     /**
      * 消息内容
      */
@@ -39,6 +40,10 @@ public class MessageEntity extends BaseEntity {
      * 消息已读或未读（0：未读，1:已读）
      */
     private Integer status = 0;
+    /**
+     * 父评论id
+     */
+    private String parentCommentId;
 
     public String getFromUserId() {
         return fromUserId;
@@ -94,5 +99,13 @@ public class MessageEntity extends BaseEntity {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getParentCommentId() {
+        return parentCommentId;
+    }
+
+    public void setParentCommentId(String parentCommentId) {
+        this.parentCommentId = parentCommentId;
     }
 }

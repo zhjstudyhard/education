@@ -4,12 +4,45 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.education.mapper.article.MessageMapper">
 
-
     <select id="queryMessageCount" resultType="java.lang.Integer">
         SELECT
         count(*)
         FROM
         b_message
         WHERE is_deleted = 0 and  status = 0 and to_user_id = #{id}
+    </select>
+
+    <select id="queryMessagePage" resultType="com.education.vo.MessageVo">
+        SELECT
+        bm.*,
+        bu.username AS fromUserName,
+        bu2.username AS toUserName
+        FROM
+        b_message bm
+        LEFT JOIN b_user bu ON bm.from_user_id = bu.id AND bu.is_deleted = 0
+        LEFT JOIN b_user bu2 on bm.to_user_id = bu2.id AND bu.is_deleted = 0
+        WHERE bm.is_deleted = 0 and bm.to_user_id = #{userId}
+    </select>
+    <select id="queryParentMessage" resultType="com.education.vo.MessageVo">
+        SELECT
+        bc.id,
+        bc.user_id AS parentFromUserId,
+        bc2.user_id AS parentToUserId,
+        bc.content AS parentContent,
+        bu.username AS parentFromUserName,
+        bu2.username AS parentToUserName
+        FROM
+        b_comment bc
+        LEFT JOIN b_user bu ON bc.user_id = bu.id
+        AND bu.is_deleted = 0
+        LEFT JOIN b_comment bc2 ON bc2.id = bc.parent_id
+        AND bc2.is_deleted = 0
+        LEFT JOIN b_user bu2 ON bu2.id = bc2.user_id
+        AND bu2.is_deleted = 0
+        WHERE
+        bc.is_deleted = 0 and bc.id in
+        <foreach collection="parentCommentIds" item="parentCommentId">
+            (#{parentCommentId})
+        </foreach>
     </select>
 </mapper>

@@ -85,6 +85,7 @@ public class CommentServiceImpl implements CommentService {
         messageEntity.setTargetType(targetType);
         messageEntity.setFromUserId(commentEntity.getUserId());
         messageEntity.setContent(commentEntity.getContent());
+        messageEntity.setParentCommentId(commentEntity.getParentId());
         //判断消息类型
         if (StringUtils.isNotBlank(commentEntity.getParentId()) && commentEntity.getParentId().equals(Constant.NUMBER_NEGATIVE_ONE)){
 

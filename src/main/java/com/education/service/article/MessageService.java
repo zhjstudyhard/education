@@ -1,6 +1,7 @@
 package com.education.service.article;
 
 import com.education.common.Result;
+import com.education.dto.article.MessageDto;
 
 /**
  * @Author: haojie
@@ -9,4 +10,6 @@ import com.education.common.Result;
  */
 public interface MessageService {
     Result queryMessageCount();
+
+    Result queryMessagePage(MessageDto messageDto);
 }
