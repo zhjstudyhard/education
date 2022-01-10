@@ -3,6 +3,13 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.education.mapper.article.MessageMapper">
+    <update id="updateBatchMessageStatus">
+        update b_message set status = 1 where is_deleted = 0
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
 
     <select id="queryMessageCount" resultType="java.lang.Integer">
         SELECT
@@ -21,7 +28,11 @@
         b_message bm
         LEFT JOIN b_user bu ON bm.from_user_id = bu.id AND bu.is_deleted = 0
         LEFT JOIN b_user bu2 on bm.to_user_id = bu2.id AND bu.is_deleted = 0
-        WHERE bm.is_deleted = 0 and bm.to_user_id = #{userId}
+        WHERE bm.is_deleted = 0
+        <if test="userId != null and userId != ''">
+            and bm.to_user_id = #{userId}
+        </if>
+        order by bm.gmt_create DESC
     </select>
     <select id="queryParentMessage" resultType="com.education.vo.MessageVo">
         SELECT

@@ -1,4 +1,4 @@
-package com.education.controller.Article;
+package com.education.controller.article;
 
 import com.education.common.Result;
 import com.education.dto.article.MessageDto;
@@ -39,9 +39,22 @@ public class MessageController {
      */
 
     @PostMapping("/queryMessagePage")
-    public Result queryMessagePage(@RequestBody MessageDto messageDto) {
+    public Result queryMessagePage(@RequestBody MessageDto messageDto) throws Exception {
         return messageService.queryMessagePage(messageDto);
     }
 
+    /**
+     * @param messageDto
+     * @return com.education.common.Result
+     * @description 删除通知
+     * @author 橘白
+     * @date 2022/1/10 14:48
+     */
+
+    @PostMapping("/delMessagePage")
+    public Result delMessagePage(@RequestBody MessageDto messageDto) {
+        messageService.delMessagePage(messageDto);
+        return Result.success();
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.education.controller.Article;
+package com.education.controller.article;
 
 import com.education.common.Result;
 import com.education.dto.article.ArticleDto;

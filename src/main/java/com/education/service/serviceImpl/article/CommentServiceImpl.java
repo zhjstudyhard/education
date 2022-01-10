@@ -19,6 +19,7 @@ import com.education.mapper.article.MessageMapper;
 import com.education.service.article.CommentService;
 import com.education.util.EntityUtil;
 import com.education.util.ShiroEntityUtil;
+import com.education.util.socket.WebSocketUtil;
 import com.education.vo.CommentVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
     private MessageMapper messageMapper;
 
     @Override
-    public void addComment(CommentDto commentDto) {
+    public void addComment(CommentDto commentDto) throws Exception{
         Subject subject = SecurityUtils.getSubject();
         UserEntity userEntity = (UserEntity) subject.getPrincipal();
         //属性赋值
@@ -77,7 +79,7 @@ public class CommentServiceImpl implements CommentService {
         addMessage(commentEntity, articleEntity,commentDto.getTargetType());
     }
 
-    public void addMessage(CommentEntity commentEntity, ArticleEntity articleEntity,Integer targetType) {
+    public void addMessage(CommentEntity commentEntity, ArticleEntity articleEntity,Integer targetType) throws Exception {
         //初始化属性值
         MessageEntity messageEntity = new MessageEntity();
         EntityUtil.addCreateInfo(messageEntity);
@@ -105,8 +107,9 @@ public class CommentServiceImpl implements CommentService {
             }
             messageEntity.setToUserId(parentCommentEntity.getUserId());
         }
-
         messageMapper.insert(messageEntity);
+        //执行完成后，通知接收消息人
+        WebSocketUtil.sendInfoByUserId(messageMapper.queryMessageCount(messageEntity.getToUserId()).toString(), messageEntity.getToUserId());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.education.vo;
 
+import java.util.Date;
+
 /**
  * @Author: haojie
  * @qq :1422471205
@@ -71,6 +73,15 @@ public class MessageVo {
      * 夫评论消息内容
      */
     private String parentContent;
+    /**
+     * 创建消息时间
+     */
+    private Date gmtCreate;
+
+    /**
+     * 消息已读或未读（0：未读，1:已读）
+     */
+    private Integer status;
 
     public String getId() {
         return id;
@@ -190,5 +201,21 @@ public class MessageVo {
 
     public void setParentCommentId(String parentCommentId) {
         this.parentCommentId = parentCommentId;
+    }
+
+    public Date getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public void setGmtCreate(Date gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

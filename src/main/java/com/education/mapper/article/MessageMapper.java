@@ -11,10 +11,7 @@ import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Author: haojie
@@ -31,4 +28,6 @@ public interface MessageMapper extends BaseMapper<MessageEntity> {
 
     @MapKey("id")
     Map<String,MessageVo> queryParentMessage(Set<String> parentCommentIds);
+
+    void updateBatchMessageStatus(List<String> ids);
 }

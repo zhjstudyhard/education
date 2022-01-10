@@ -1,4 +1,4 @@
-package com.education.controller.Article;
+package com.education.controller.article;
 
 import com.education.common.Result;
 import com.education.dto.article.CommentDto;
@@ -28,7 +28,7 @@ public class CommentController {
      */
 
     @PostMapping("addComment")
-    public Result addComment(@Validated @RequestBody CommentDto commentDto) {
+    public Result addComment(@Validated @RequestBody CommentDto commentDto) throws Exception{
         commentService.addComment(commentDto);
         return Result.success();
     }

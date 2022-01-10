@@ -9,7 +9,7 @@ import com.education.dto.article.CommentDto;
  * @CreateTime: 2021-12-26-19-09
  */
 public interface CommentService {
-    void addComment(CommentDto commentDto);
+    void addComment(CommentDto commentDto) throws Exception;
 
     void delComment(CommentDto commentDto);
 

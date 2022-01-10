@@ -12,6 +12,8 @@ public class Constant {
     public static final int ISDELETED_TRUE = 1;
     //-1
     public static final String NUMBER_NEGATIVE_ONE = "-1";
+    //0
+    public static final Integer NUMBER_ZERO = 0;
     //刷新令牌redis的key
     public final static String SHIRO_REFRESH_TOKEN = "shiro:refresh_token:";
     //标志时间戳

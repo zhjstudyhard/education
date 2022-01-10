@@ -3,6 +3,8 @@ package com.education.service.article;
 import com.education.common.Result;
 import com.education.dto.article.MessageDto;
 
+import java.io.IOException;
+
 /**
  * @Author: haojie
  * @qq :1422471205
@@ -11,5 +13,7 @@ import com.education.dto.article.MessageDto;
 public interface MessageService {
     Result queryMessageCount();
 
-    Result queryMessagePage(MessageDto messageDto);
+    Result queryMessagePage(MessageDto messageDto) throws IOException, Exception;
+
+    void delMessagePage(MessageDto messageDto);
 }
