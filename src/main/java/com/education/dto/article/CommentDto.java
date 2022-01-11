@@ -45,6 +45,11 @@ public class CommentDto {
     @NotNull(message = "关联类型不能为空")
     private Integer targetType;
 
+    /**
+     * 是否后台请求（0:否，1：是）
+     */
+    private Integer isAdmin;
+
     public String getId() {
         return id;
     }
@@ -115,5 +120,13 @@ public class CommentDto {
 
     public void setTargetType(Integer targetType) {
         this.targetType = targetType;
+    }
+
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

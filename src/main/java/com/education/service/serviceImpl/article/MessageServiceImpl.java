@@ -50,7 +50,16 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Result queryMessagePage(MessageDto messageDto) throws Exception {
         UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
-        messageDto.setUserId(userEntity.getId());
+        if (messageDto.getIsAdmin() != null) {
+            if (messageDto.getIsAdmin().equals(0)) {
+                messageDto.setUserId(userEntity.getId());
+            } else {
+                Boolean flag = ShiroEntityUtil.checkPermission();
+                if (flag) {
+                    messageDto.setUserId(userEntity.getId());
+                }
+            }
+        }
         //未读状态消息的id集合
         List<String> ids = new ArrayList<>();
         PageHelper.startPage(messageDto.getCurrentPage(), messageDto.getPageSize());

@@ -64,8 +64,8 @@ public class ArticleController {
      * @date 2022/1/6 20:42
      */
     @PostMapping("getAllArticle")
-    public Result getAllArticle() {
-        return articleService.getAllArticle();
+    public Result getAllArticle(@RequestBody ArticleDto articleDto) {
+        return articleService.getAllArticle(articleDto);
     }
 
     /**

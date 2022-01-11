@@ -63,11 +63,17 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Result getArticlePage(ArticleDto articleDto) {
         UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
-
-        Boolean flag = ShiroEntityUtil.checkPermission();
-        if (flag){
-            articleDto.setUserId(userEntity.getId());
+        if (articleDto.getIsAdmin() != null) {
+            if (articleDto.getIsAdmin().equals(0)) {
+                articleDto.setUserId(userEntity.getId());
+            } else {
+                Boolean flag = ShiroEntityUtil.checkPermission();
+                if (flag) {
+                    articleDto.setUserId(userEntity.getId());
+                }
+            }
         }
+
         PageHelper.startPage(articleDto.getCurrentPage(), articleDto.getPageSize());
         PageInfo<ArticleVo> pageInfo = new PageInfo<>(articleMapper.getArticlePage(articleDto));
         ResponsePageDto<ArticleVo> articleVoResponsePageDto = new ResponsePageDto<>(pageInfo.getList(), pageInfo.getTotal(), pageInfo.getPageSize(), pageInfo.getPageNum());
@@ -83,13 +89,18 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Result getAllArticle() {
+    public Result getAllArticle(ArticleDto articleDto) {
         UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
-        Boolean flag = ShiroEntityUtil.checkPermission();
 
-        ArticleDto articleDto = new ArticleDto();
-        if (flag){
-            articleDto.setUserId(userEntity.getId());
+        if (articleDto.getIsAdmin() != null) {
+            if (articleDto.getIsAdmin().equals(0)) {
+                articleDto.setUserId(userEntity.getId());
+            } else {
+                Boolean flag = ShiroEntityUtil.checkPermission();
+                if (flag) {
+                    articleDto.setUserId(userEntity.getId());
+                }
+            }
         }
 
         PageInfo<ArticleVo> pageInfo = new PageInfo<>(articleMapper.getArticlePage(articleDto));

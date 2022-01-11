@@ -73,6 +73,11 @@ public class ArticleDto {
      */
     private Integer status;
 
+    /**
+     * 是否后台请求（0:否，1是）
+     */
+    private Integer isAdmin;
+
 
     public String getTitle() {
         return title;
@@ -168,5 +173,13 @@ public class ArticleDto {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

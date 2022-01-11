@@ -14,6 +14,8 @@ public class Constant {
     public static final String NUMBER_NEGATIVE_ONE = "-1";
     //0
     public static final Integer NUMBER_ZERO = 0;
+    //1
+    public static final Integer NUMBER_ONE = 1;
     //刷新令牌redis的key
     public final static String SHIRO_REFRESH_TOKEN = "shiro:refresh_token:";
     //标志时间戳
@@ -28,5 +30,8 @@ public class Constant {
     public final static String MESSAGE_COMMENT = "MESSAGE_COMMENT";
     //系统通知
     public final static String MESSAGE_SYSTEM = "MESSAGE_SYSTEM";
+    //es文章索引
+    public final static String ARTICLE_INDEX = "article";
+
 
 }

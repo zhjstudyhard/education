@@ -150,10 +150,20 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Result queryAllComment(CommentDto commentDto) {
         UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
-        Boolean flag = ShiroEntityUtil.checkPermission();
-        if (flag) {
-            commentDto.setUserId(userEntity.getId());
+        if (commentDto.getIsAdmin() != null) {
+            if (commentDto.getIsAdmin().equals(0)) {
+                commentDto.setUserId(userEntity.getId());
+            } else {
+                Boolean flag = ShiroEntityUtil.checkPermission();
+                if (flag) {
+                    commentDto.setUserId(userEntity.getId());
+                }
+            }
         }
+//        Boolean flag = ShiroEntityUtil.checkPermission();
+//        if (flag) {
+//            commentDto.setUserId(userEntity.getId());
+//        }
         PageHelper.startPage(commentDto.getCurrentPage(), commentDto.getPageSize());
         PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentMapper.queryAllComment(commentDto));
         return Result.success().data("data", new ResponsePageDto<>(commentVoPageInfo.getList(), commentVoPageInfo.getTotal(), commentVoPageInfo.getPageSize(), commentVoPageInfo.getPageNum()));

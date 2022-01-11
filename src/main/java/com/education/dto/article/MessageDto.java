@@ -23,6 +23,11 @@ public class MessageDto {
      */
     private String userId;
 
+    /**
+     * 是否后台管理请求（0:否，1：是）
+     */
+    private Integer isAdmin;
+
     public String getId() {
         return id;
     }
@@ -53,5 +58,13 @@ public class MessageDto {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

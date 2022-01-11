@@ -1,6 +1,8 @@
 package com.education.config;
 
 import com.education.service.article.ArticleService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,6 +19,8 @@ import java.util.Set;
 @Configuration
 public class ArticleRedisTask {
 
+    private static final Logger logger = LogManager.getLogger();
+
     @Autowired
     private ArticleService articleService;
 
@@ -27,5 +31,6 @@ public class ArticleRedisTask {
     private void configureTasks() throws Exception {
         //更新文章排行榜数据
         articleService.zsetArticle();
+        logger.info("文章缓存定时更新完成");
     }
 }
