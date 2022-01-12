@@ -29,7 +29,7 @@ public class EntityUtil {
 
         if (object instanceof BaseEntity) {
             ((BaseEntity) object).setGmtCreate(new Date());
-            ((BaseEntity) object).setNameCreate(userEntity.getRealName());
+            ((BaseEntity) object).setNameCreate(userEntity.getUsername());
             ((BaseEntity) object).setGmtModified(null);
             ((BaseEntity) object).setNameModified(null);
         }
@@ -46,7 +46,7 @@ public class EntityUtil {
 
         if (object instanceof BaseEntity) {
             ((BaseEntity) object).setGmtModified(new Date());
-            ((BaseEntity) object).setNameModified(userEntity.getRealName());
+            ((BaseEntity) object).setNameModified(userEntity.getUsername());
         }
     }
 }

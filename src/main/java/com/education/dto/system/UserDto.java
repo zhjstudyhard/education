@@ -51,7 +51,7 @@ public class UserDto {
     /**
      * 用户真正的名称
      */
-    @NotBlank(message = "姓名不能为空")
+//    @NotBlank(message = "姓名不能为空")
     private String realName;
 
     /**

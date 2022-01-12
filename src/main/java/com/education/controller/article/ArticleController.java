@@ -27,7 +27,7 @@ public class ArticleController {
      * @date 2021/12/15 9:56
      */
     @PostMapping("addArticle")
-    public Result addArticle(@Validated @RequestBody ArticleDto articleDto) {
+    public Result addArticle(@Validated @RequestBody ArticleDto articleDto) throws Exception{
         articleService.addArticle(articleDto);
         return Result.success();
     }
@@ -77,7 +77,7 @@ public class ArticleController {
      */
 
     @PostMapping("deleteArticleById")
-    public Result deleteArticleById(@RequestBody ArticleDto articleDto) {
+    public Result deleteArticleById(@RequestBody ArticleDto articleDto) throws Exception{
         articleService.deleteArticleById(articleDto);
         return Result.success();
     }
@@ -104,7 +104,7 @@ public class ArticleController {
      */
 
     @PostMapping("updateArticle")
-    public Result updateArticle(@RequestBody ArticleDto articleDto) {
+    public Result updateArticle(@RequestBody ArticleDto articleDto) throws Exception{
         articleService.updateArticle(articleDto);
         return Result.success();
     }

@@ -1,10 +1,9 @@
 package com.education.controller.es;
 
+import com.education.common.Result;
 import com.education.service.es.ElasticSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author: haojie
@@ -13,9 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/es")
+@CrossOrigin
 public class EsController {
     @Autowired
     private ElasticSearchService elasticSearchService;
+
     /**
      * @description 批量添加ES数据
      * @author 橘白
@@ -23,8 +24,21 @@ public class EsController {
      */
 
     @PostMapping("saveAll")
-    public void saveAll() throws Exception{
+    public void saveAll() throws Exception {
         elasticSearchService.saveAll();
+    }
+
+    /**
+     * @param keyWords
+     * @return com.education.common.Result
+     * @description es搜索查询
+     * @author 橘白
+     * @date 2022/1/12 15:13
+     */
+
+    @PostMapping("esSearch")
+    public Result esSearch(@RequestBody String keyWords) throws Exception {
+        return elasticSearchService.esSearch(keyWords);
     }
 
 }

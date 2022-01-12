@@ -34,49 +34,73 @@ public class UserController {
     }
 
     /**
-     * @description  删除用户
      * @param userDto
      * @return java.lang.Object
+     * @description 删除用户
      * @author 橘白
      * @date 2021/11/22 21:29
      */
 
     @PostMapping("/deleteUser")
-    public Object deleteUser(@RequestBody UserDto userDto){
+    public Object deleteUser(@RequestBody UserDto userDto) {
         userService.deleteUser(userDto);
         return Result.success();
     }
 
     /**
-     * @description  更新用户
      * @param userDto
      * @return java.lang.Object
+     * @description 更新用户
      * @author 橘白
      * @date 2021/11/22 21:47
      */
 
     @PostMapping("/editUser")
-    public Object editUser(@Validated @RequestBody UserDto userDto){
+    public Object editUser(@Validated @RequestBody UserDto userDto) {
         userService.editUser(userDto);
         return Result.success();
     }
 
     /**
-     * @description  添加用户名
      * @param userDto
      * @return java.lang.Object
+     * @description 添加用户名
      * @author 橘白
      * @date 2021/11/23 16:21
      */
     @PostMapping("/addUser")
-    public Object addUser(@Validated @RequestBody UserDto userDto){
+    public Object addUser(@Validated @RequestBody UserDto userDto) {
         userService.addUser(userDto);
         return Result.success();
     }
+
+    /**
+     * @param passwordDto
+     * @return java.lang.Object
+     * @description 修改密码
+     * @author 橘白
+     * @date 2022/1/12 20:15
+     */
 
     @PostMapping("/updatePassword")
     public Object updatePassword(@Validated @RequestBody PasswordDto passwordDto) throws Exception {
         userService.updatePassword(passwordDto);
         return Result.success();
     }
+
+    /**
+     * @param userDto
+     * @return java.lang.Object
+     * @description 注册用户
+     * @author 橘白
+     * @date 2022/1/12 20:28
+     */
+
+    @PostMapping("/registeUser")
+    public Object registeUser(@RequestBody UserDto userDto) throws Exception {
+        userService.registeUser(userDto);
+        return Result.success();
+    }
+
+
 }

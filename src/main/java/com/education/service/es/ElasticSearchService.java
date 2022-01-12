@@ -1,5 +1,6 @@
 package com.education.service.es;
 
+import com.education.common.Result;
 import com.education.entity.article.ArticleEntity;
 
 /**
@@ -16,4 +17,6 @@ public interface ElasticSearchService{
     void delete(ArticleEntity articleEntity) throws Exception;
 
     void update(ArticleEntity articleEntity) throws Exception;
+
+    Result esSearch(String keyWords) throws Exception;
 }

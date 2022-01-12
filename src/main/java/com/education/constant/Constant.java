@@ -32,6 +32,7 @@ public class Constant {
     public final static String MESSAGE_SYSTEM = "MESSAGE_SYSTEM";
     //es文章索引
     public final static String ARTICLE_INDEX = "article";
-
+    //普通用户角色
+    public final static String ROLE_USER = "user";
 
 }

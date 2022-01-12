@@ -1,7 +1,9 @@
 package com.education.service.serviceImpl.es;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.education.common.Result;
 import com.education.common.ResultCode;
 import com.education.constant.Constant;
 import com.education.entity.article.ArticleEntity;
@@ -19,19 +21,31 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: haojie
@@ -39,6 +53,7 @@ import java.util.List;
  * @CreateTime: 2022-01-11-18-46
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class ElasticSearchServiceImpl implements ElasticSearchService {
     private static final Logger logger = LogManager.getLogger();
 
@@ -81,6 +96,7 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
         }
     }
 
+    @Async
     @Override
     public void save(ArticleEntity articleEntity) throws Exception {
         DocumentArticleEntity documentArticleEntity = copyEntity(articleEntity);
@@ -91,6 +107,7 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
         logger.info("es数据添加成功");
     }
 
+    @Async
     @Override
     public void delete(ArticleEntity articleEntity) throws Exception {
         //判断目标文档是否存在
@@ -105,6 +122,7 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
         logger.info("es数据删除成功");
     }
 
+    @Async
     @Override
     public void update(ArticleEntity articleEntity) throws Exception {
         //判断目标文档是否存在
@@ -138,4 +156,53 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
         return exists;
     }
 
+    @Override
+    public Result esSearch(String keyWords) throws Exception {
+        //条件搜索
+        SearchRequest searchRequest = new SearchRequest(Constant.ARTICLE_INDEX);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //查询构造器
+        MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(keyWords, "content", "description", "title");
+        searchSourceBuilder.query(multiMatchQueryBuilder);
+        //高亮构造器
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        //是否多个字段高亮;
+        highlightBuilder.requireFieldMatch(true);
+        //设置高亮的字段
+        highlightBuilder.field("title");
+        highlightBuilder.field("description");
+        highlightBuilder.field("content");
+        //设置前缀
+        highlightBuilder.preTags("<span style='color:red'>");
+        //设置后缀
+        highlightBuilder.postTags("</span>");
+
+        searchSourceBuilder.highlighter(highlightBuilder);
+        searchRequest.source(searchSourceBuilder);
+        //执行搜索
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        //获取查询数据
+        List<DocumentArticleEntity> list = new ArrayList<>();
+
+        SearchHit[] hits = searchResponse.getHits().getHits();
+        if (hits.length > 0){
+            for (SearchHit searchHit : hits) {
+                DocumentArticleEntity documentArticleEntity = JSONObject.parseObject(searchHit.getSourceAsString(), DocumentArticleEntity.class);
+                //高亮字段
+                Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
+                if (highlightFields.containsKey("title")){
+                    documentArticleEntity.setTitle(highlightFields.get("title").getFragments()[0].toString());
+                }
+                if (highlightFields.containsKey("description")){
+                    documentArticleEntity.setDescription(highlightFields.get("description").getFragments()[0].toString());
+                }
+                if (highlightFields.containsKey("content")){
+                    documentArticleEntity.setContent(highlightFields.get("content").getFragments()[0].toString());
+                }
+                list.add(documentArticleEntity);
+            }
+        }
+        return Result.success().data("data", list);
+//        return Result.success().data("data", searchResponse);
+    }
 }

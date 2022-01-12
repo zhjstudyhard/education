@@ -12,6 +12,7 @@ import com.education.entity.system.UserEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.article.ArticleMapper;
 import com.education.service.article.ArticleService;
+import com.education.service.es.ElasticSearchService;
 import com.education.util.EntityUtil;
 import com.education.util.RedisUtil;
 import com.education.util.ShiroEntityUtil;
@@ -48,8 +49,11 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ArticleMapper articleMapper;
 
+    @Autowired
+    private ElasticSearchService elasticSearchService;
+
     @Override
-    public void addArticle(ArticleDto articleDto) {
+    public void addArticle(ArticleDto articleDto) throws Exception{
         //复制属性
         ArticleEntity articleEntity = new ArticleEntity();
         BeanUtils.copyProperties(articleDto, articleEntity);
@@ -58,6 +62,11 @@ public class ArticleServiceImpl implements ArticleService {
         articleEntity.setUserId(shiroEntity.getId());
         EntityUtil.addCreateInfo(articleEntity);
         articleMapper.insert(articleEntity);
+
+        //判断是否启用,添加入es中
+        if (articleEntity.getStatus().equals(Constant.NUMBER_ONE)){
+            elasticSearchService.save(articleEntity);
+        }
     }
 
     @Override
@@ -109,7 +118,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void deleteArticleById(ArticleDto articleDto) {
+    public void deleteArticleById(ArticleDto articleDto) throws Exception{
         //校验参数
         if (StringUtils.isBlank(articleDto.getId())) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
@@ -124,6 +133,9 @@ public class ArticleServiceImpl implements ArticleService {
         EntityUtil.addModifyInfo(articleEntity);
 
         articleMapper.updateById(articleEntity);
+
+        //删除es中数据
+        elasticSearchService.delete(articleEntity);
     }
 
     @Override
@@ -146,7 +158,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void updateArticle(ArticleDto articleDto) {
+    public void updateArticle(ArticleDto articleDto) throws Exception{
         //校验数据
         ArticleEntity articleEntity = articleMapper.selectById(articleDto.getId());
         if (articleEntity == null) {
@@ -156,6 +168,9 @@ public class ArticleServiceImpl implements ArticleService {
         EntityUtil.addModifyInfo(articleEntity);
 
         articleMapper.updateById(articleEntity);
+
+        //更新es文档
+        elasticSearchService.update(articleEntity);
     }
 
     @Override

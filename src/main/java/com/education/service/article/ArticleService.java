@@ -11,15 +11,15 @@ import java.text.ParseException;
  * @CreateTime: 2021-12-15-09-58
  */
 public interface ArticleService {
-    void addArticle(ArticleDto articleDto);
+    void addArticle(ArticleDto articleDto) throws Exception;
 
     Result getArticlePage(ArticleDto articleDto);
 
-    void deleteArticleById(ArticleDto articleDto);
+    void deleteArticleById(ArticleDto articleDto) throws Exception;
 
     Result getArticleById(ArticleDto articleDto);
 
-    void updateArticle(ArticleDto articleDto);
+    void updateArticle(ArticleDto articleDto) throws Exception;
 
     void zsetArticle() throws Exception;
 
