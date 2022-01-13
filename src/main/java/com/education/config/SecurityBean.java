@@ -1,5 +1,6 @@
 package com.education.config;
 
+import com.education.controller.upload.UploadFileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,9 @@ public class SecurityBean {
      */
     public static String encryptRSAKey;
 
+    //文件路径
+    private static String filePath;
+
     @Value("${security.refreshTokenExpireTime}")
     private void setRefreshTokenExpireTime(String refreshTokenExpireTime) {
         SecurityBean.refreshTokenExpireTime = refreshTokenExpireTime;
@@ -55,5 +59,14 @@ public class SecurityBean {
     @Value("${security.encryptRSAKey}")
     public void setEncryptRSAKey(String encryptRSAKey) {
         SecurityBean.encryptRSAKey = encryptRSAKey;
+    }
+
+
+    /**
+     * 文件路径
+     */
+    @Value("${education.uploadFile.filePath}")
+    public void setFilePath(String filePath){
+        SecurityBean.filePath = filePath;
     }
 }

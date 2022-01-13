@@ -42,4 +42,9 @@ logging:
     org.apache.tomcat: INFO
     org.springframework: INFO
     com.chinamobile.cmss.bdpaas.resource.monitor: DEBUG
+education:
+  uploadFile:
+    filePath: D:/educationFile/
+    filePathUrl: http://127.0.0.1:8089/api
+
 

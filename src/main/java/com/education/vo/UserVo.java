@@ -45,6 +45,15 @@ public class UserVo {
      */
     private String roleName;
 
+    /**
+     * 创建时间
+     */
+    private Date gmtCreate;
+    /**
+     * 用户头像
+     */
+    private String avatar;
+
     public String getId() {
         return id;
     }
@@ -115,5 +124,21 @@ public class UserVo {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+    public Date getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public void setGmtCreate(Date gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

@@ -44,6 +44,10 @@ public class UserEntity extends BaseEntity {
      * 用户真正的名称
      */
     private String realName;
+    /**
+     * 头像
+     */
+    private String avatar;
 
     public UserEntity() {
     }
@@ -102,5 +106,13 @@ public class UserEntity extends BaseEntity {
 
     public void setRealName(String realName) {
         this.realName = realName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }
