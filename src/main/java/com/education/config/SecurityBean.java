@@ -32,8 +32,14 @@ public class SecurityBean {
      */
     public static String encryptRSAKey;
 
-    //文件路径
-    private static String filePath;
+    /**
+     * 文件路径
+     */
+    public static String filePath;
+    /**
+     * 文件下载路径
+     */
+    public static String filePathUrl;
 
     @Value("${security.refreshTokenExpireTime}")
     private void setRefreshTokenExpireTime(String refreshTokenExpireTime) {
@@ -41,7 +47,7 @@ public class SecurityBean {
     }
 
     @Value("${security.accessTokenExpireTime}")
-    private  void setAccessTokenExpireTime(String accessTokenExpireTime) {
+    private void setAccessTokenExpireTime(String accessTokenExpireTime) {
         SecurityBean.accessTokenExpireTime = accessTokenExpireTime;
     }
 
@@ -66,7 +72,15 @@ public class SecurityBean {
      * 文件路径
      */
     @Value("${education.uploadFile.filePath}")
-    public void setFilePath(String filePath){
+    public void setFilePath(String filePath) {
         SecurityBean.filePath = filePath;
+    }
+
+    /**
+     * 文件下载路径
+     */
+    @Value("${education.uploadFile.filePathUrl}")
+    public void setFilePathUrl(String filePathUrl) {
+        SecurityBean.filePathUrl = filePathUrl;
     }
 }

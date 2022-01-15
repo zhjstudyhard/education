@@ -23,4 +23,6 @@ public interface UserService {
     void updatePassword(PasswordDto passwordDto) throws Exception;
 
     void registeUser(UserDto userDto) throws Exception;
+
+    void updateAvatar(UserDto userDto);
 }

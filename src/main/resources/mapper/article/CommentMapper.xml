@@ -7,7 +7,8 @@
     <select id="queryComment" resultType="com.education.vo.CommentVo">
         select
         bc.*,
-        bu.username
+        bu.username,
+        bu.avatar
         from b_comment bc
         left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
         where bc.is_deleted = 0 and bc.article_id = #{articleId} and bc.parent_id = -1
@@ -16,7 +17,8 @@
     <select id="queryApplyComment" resultType="com.education.vo.CommentVo">
         select
         bc.*,
-        bu.username
+        bu.username,
+        bu.avatar
         from b_comment bc
         left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
         where bc.is_deleted = 0 and bc.article_id = #{articleId}
@@ -34,6 +36,7 @@
         select
         bc.*,
         bu.username,
+        bu.avatar,
         ba.title as title
         from b_comment bc
         left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0

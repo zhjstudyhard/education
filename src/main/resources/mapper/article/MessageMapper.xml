@@ -23,6 +23,7 @@
         SELECT
         bm.*,
         bu.username AS fromUserName,
+        bu.avatar,
         bu2.username AS toUserName
         FROM
         b_message bm

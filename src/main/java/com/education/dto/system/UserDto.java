@@ -1,8 +1,11 @@
 package com.education.dto.system;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 import java.util.Date;
 
 /**
@@ -51,7 +54,6 @@ public class UserDto {
     /**
      * 用户真正的名称
      */
-//    @NotBlank(message = "姓名不能为空")
     private String realName;
 
     /**
@@ -59,6 +61,12 @@ public class UserDto {
      */
     @NotBlank(message = "角色不能为空")
     private String roleId;
+
+    /**
+     * 文件id
+     */
+    @NotBlank(message = "请上传文件",groups = {updateAvater.class})
+    private String fileId;
 
     public String getId() {
         return id;
@@ -146,5 +154,17 @@ public class UserDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public interface updateAvater{
+
     }
 }

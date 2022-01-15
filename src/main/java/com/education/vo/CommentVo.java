@@ -48,6 +48,7 @@ public class CommentVo {
      * 评论人头像
      */
     private String avatar;
+
     /**
      * 评论人名称
      */

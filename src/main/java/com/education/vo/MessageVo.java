@@ -82,6 +82,10 @@ public class MessageVo {
      * 消息已读或未读（0：未读，1:已读）
      */
     private Integer status;
+    /**
+     * 头像
+     */
+    private String avatar;
 
     public String getId() {
         return id;
@@ -217,5 +221,13 @@ public class MessageVo {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

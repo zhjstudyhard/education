@@ -102,5 +102,19 @@ public class UserController {
         return Result.success();
     }
 
+    /**
+     * @param userDto
+     * @return java.lang.Object
+     * @description 修改头像
+     * @author 橘白
+     * @date 2022/1/15 16:41
+     */
+
+    @PostMapping("/updateAvatar")
+    public Object updateAvatar(@Validated({UserDto.updateAvater.class}) @RequestBody UserDto userDto) throws Exception {
+        userService.updateAvatar(userDto);
+        return Result.success();
+    }
+
 
 }

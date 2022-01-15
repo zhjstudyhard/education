@@ -45,6 +45,6 @@ logging:
 education:
   uploadFile:
     filePath: D:/educationFile/
-    filePathUrl: http://127.0.0.1:8089/api
+    filePathUrl: http://127.0.0.1:8089/api/upload
 
 

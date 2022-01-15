@@ -5,6 +5,7 @@ import com.education.common.Result;
 import com.education.common.ResultCode;
 import com.education.config.SecurityBean;
 import com.education.constant.Constant;
+import com.education.controller.upload.UploadFileUtil;
 import com.education.dto.base.ResponsePageDto;
 import com.education.dto.system.DictionaryDto;
 import com.education.dto.system.PasswordDto;
@@ -13,11 +14,13 @@ import com.education.entity.system.DictionaryEntity;
 import com.education.entity.system.RoleEntity;
 import com.education.entity.system.UserEntity;
 import com.education.entity.system.UserRoleEntity;
+import com.education.entity.uploadfile.UploadFileEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.system.DictionaryMapper;
 import com.education.mapper.system.RoleMapper;
 import com.education.mapper.system.UserMapper;
 import com.education.mapper.system.UserRoleMapper;
+import com.education.mapper.upload.UploadFileMapper;
 import com.education.service.system.DictionaryService;
 import com.education.service.system.UserService;
 import com.education.util.EntityUtil;
@@ -53,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleMapper roleMapper;
+
+    @Autowired
+    private UploadFileMapper uploadFileMapper;
 
     @Override
     public Result queryUserAllPage(UserDto userDto) {
@@ -207,6 +213,25 @@ public class UserServiceImpl implements UserService {
 
             userRoleMapper.insert(userRoleEntity);
         }
+    }
 
+    @Override
+    public void updateAvatar(UserDto userDto) {
+        UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
+        //更新关联id
+        UploadFileEntity uploadFileEntity = uploadFileMapper.selectById(userDto.getFileId());
+        if (uploadFileEntity != null){
+            uploadFileEntity.setRelativeId(userEntity.getId());
+            EntityUtil.addModifyInfo(uploadFileEntity);
+            uploadFileMapper.updateById(uploadFileEntity);
+
+            //修改用户表
+            userEntity.setAvatar(uploadFileEntity.getFilePath());
+            EntityUtil.addModifyInfo(userEntity);
+            userMapper.updateById(userEntity);
+
+        }else {
+            throw new EducationException(Result.fail().getCode(),"图片不存在");
+        }
     }
 }

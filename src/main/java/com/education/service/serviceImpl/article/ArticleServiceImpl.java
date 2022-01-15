@@ -133,13 +133,7 @@ public class ArticleServiceImpl implements ArticleService {
         EntityUtil.addModifyInfo(articleEntity);
 
         articleMapper.updateById(articleEntity);
-        //判断是否启用,添加入es中
-        if (articleEntity.getStatus().equals(Constant.NUMBER_ONE)) {
-            elasticSearchService.save(articleEntity);
-        } else {
-            //删除es中数据
-            elasticSearchService.delete(articleEntity);
-        }
+
 
     }
 
@@ -165,17 +159,33 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public void updateArticle(ArticleDto articleDto) throws Exception {
         //校验数据
+        ArticleEntity articleEntityLocal = new ArticleEntity();
         ArticleEntity articleEntity = articleMapper.selectById(articleDto.getId());
         if (articleEntity == null) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
         }
+        BeanUtils.copyProperties(articleEntity, articleEntityLocal);
         BeanUtils.copyProperties(articleDto, articleEntity);
         EntityUtil.addModifyInfo(articleEntity);
 
         articleMapper.updateById(articleEntity);
 
-        //更新es文档
-        elasticSearchService.update(articleEntity);
+        //判断是否启用,添加入es中
+
+        if (articleEntity.getStatus().equals(Constant.NUMBER_ONE)) {
+            if (articleEntityLocal.getStatus().equals(articleEntity.getStatus())) {
+                //更新es文档
+                elasticSearchService.update(articleEntity);
+            } else {
+                elasticSearchService.save(articleEntity);
+            }
+
+        } else {
+            //删除es中数据
+            elasticSearchService.delete(articleEntity);
+        }
+
+
     }
 
     @Override

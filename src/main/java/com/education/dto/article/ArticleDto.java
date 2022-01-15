@@ -60,6 +60,7 @@ public class ArticleDto {
     /**
      * 文章分类
      */
+    @NotBlank(message = "文章分类不能为空")
     private String type;
 
     /**
