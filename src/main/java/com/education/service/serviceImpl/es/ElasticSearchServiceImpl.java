@@ -131,6 +131,7 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
             //更新文档数据
             DocumentArticleEntity documentArticleEntity = copyEntity(articleEntity);
             UpdateRequest updateRequest = new UpdateRequest(Constant.ARTICLE_INDEX, documentArticleEntity.getId());
+            updateRequest.doc(JSON.toJSONString(documentArticleEntity),XContentType.JSON);
             UpdateResponse updateResponse = restHighLevelClient.update(updateRequest, RequestOptions.DEFAULT);
         }
 

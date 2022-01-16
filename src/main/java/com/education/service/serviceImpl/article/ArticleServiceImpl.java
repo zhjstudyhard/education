@@ -2,6 +2,7 @@ package com.education.service.serviceImpl.article;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.Result;
 import com.education.common.ResultCode;
 import com.education.constant.Constant;
@@ -9,8 +10,10 @@ import com.education.dto.article.ArticleDto;
 import com.education.dto.base.ResponsePageDto;
 import com.education.entity.article.ArticleEntity;
 import com.education.entity.system.UserEntity;
+import com.education.entity.uploadfile.UploadFileEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.article.ArticleMapper;
+import com.education.mapper.upload.UploadFileMapper;
 import com.education.service.article.ArticleService;
 import com.education.service.es.ElasticSearchService;
 import com.education.util.EntityUtil;
@@ -24,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -52,6 +56,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ElasticSearchService elasticSearchService;
 
+    @Autowired
+    private UploadFileMapper uploadFileMapper;
+
     @Override
     public void addArticle(ArticleDto articleDto) throws Exception {
         //复制属性
@@ -62,6 +69,12 @@ public class ArticleServiceImpl implements ArticleService {
         articleEntity.setUserId(shiroEntity.getId());
         EntityUtil.addCreateInfo(articleEntity);
         articleMapper.insert(articleEntity);
+        //修改新增的图片关联信息
+        if (StringUtils.isNotBlank(articleDto.getFilePaths())) {
+            List<String> filePathList = Arrays.asList(articleDto.getFilePaths().split(","));
+
+            uploadFileMapper.updateRelativeId(filePathList, articleEntity.getId());
+        }
 
         //判断是否启用,添加入es中
         if (articleEntity.getStatus().equals(Constant.NUMBER_ONE)) {
@@ -169,7 +182,30 @@ public class ArticleServiceImpl implements ArticleService {
         EntityUtil.addModifyInfo(articleEntity);
 
         articleMapper.updateById(articleEntity);
+        //更改图片关联
+        if (StringUtils.isNotBlank(articleDto.getFilePaths())) {
+            List<String> filePathListLocal = Arrays.asList(articleDto.getFilePaths().split(","));
+            ArrayList<String> filePathList = new ArrayList<>(filePathListLocal);
+            ArrayList<String> delFilePathList = new ArrayList<>(filePathListLocal);
+            //查询该文章的所有的图片信息
+            QueryWrapper<UploadFileEntity> uploadFileEntityQueryWrapper = new QueryWrapper<>();
+            uploadFileEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
+                    .eq("relative_id", articleEntity.getId());
+            List<UploadFileEntity> uploadFileEntities = uploadFileMapper.selectList(uploadFileEntityQueryWrapper);
+            List<String> uploadFileList = uploadFileEntities.stream().map(o -> o.getFilePath()).collect(Collectors.toList());
 
+            //修改新增的图片关联信息
+            filePathList.removeAll(uploadFileList);
+            if (filePathList.size() > 0) {
+                uploadFileMapper.updateRelativeId(filePathList, articleEntity.getId());
+            }
+            //修改删除的图片信息
+            uploadFileList.removeAll(delFilePathList);
+            if (uploadFileList.size() > 0) {
+                uploadFileMapper.delRelativeId(uploadFileList, articleEntity.getId());
+            }
+
+        }
         //判断是否启用,添加入es中
 
         if (articleEntity.getStatus().equals(Constant.NUMBER_ONE)) {

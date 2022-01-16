@@ -78,6 +78,10 @@ public class ArticleDto {
      * 是否后台请求（0:否，1是）
      */
     private Integer isAdmin;
+    /**
+     * 前端穿的所有图片路径
+     */
+    private String filePaths;
 
 
     public String getTitle() {
@@ -182,5 +186,13 @@ public class ArticleDto {
 
     public void setIsAdmin(Integer isAdmin) {
         this.isAdmin = isAdmin;
+    }
+
+    public String getFilePaths() {
+        return filePaths;
+    }
+
+    public void setFilePaths(String filePaths) {
+        this.filePaths = filePaths;
     }
 }

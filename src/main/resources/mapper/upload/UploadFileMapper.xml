@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.upload.UploadFileMapper">
+
+    <update id="updateRelativeId">
+        update b_uploadfile set relative_id = #{id}
+        where is_deleted = 0
+        <if test="filePathList != null and filePathList.size > 0">
+            and file_path in
+            <foreach collection="filePathList" item="filePath" open="(" separator="," close=")">
+                #{filePath}
+            </foreach>
+        </if>
+    </update>
+    <delete id="delRelativeId">
+        update b_uploadfile set is_deleted = 1
+        where is_deleted = 0 and relative_id = #{id}
+        <if test="uploadFileList != null and uploadFileList.size > 0">
+            and file_path in
+            <foreach collection="uploadFileList" item="uploadFile" open="(" separator="," close=")">
+                #{uploadFile}
+            </foreach>
+        </if>
+    </delete>
+</mapper>
