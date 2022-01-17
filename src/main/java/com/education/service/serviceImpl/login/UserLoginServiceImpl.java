@@ -8,13 +8,11 @@ import com.education.config.SecurityBean;
 import com.education.constant.Constant;
 import com.education.dto.system.UserDto;
 import com.education.entity.system.UserEntity;
+import com.education.entity.system.UserRoleEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.system.UserMapper;
 import com.education.service.login.UserLoginService;
-import com.education.util.JWTUntils;
-import com.education.util.MD5Util;
-import com.education.util.RSAUtil;
-import com.education.util.RedisUtil;
+import com.education.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -28,7 +26,9 @@ import javax.xml.crypto.Data;
 import java.security.Security;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @Author: haojie
@@ -43,9 +43,6 @@ public class UserLoginServiceImpl implements UserLoginService {
     private UserMapper userMapper;
 
 
-//    @Value("${security.refreshTokenExpireTime}")
-//    private String refreshTokenExpireTime;
-
     @Override
     public Result login(UserDto userDto, HttpServletResponse response) throws Exception {
         if (StringUtils.isBlank(userDto.getUsername())) {
@@ -54,6 +51,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         if (StringUtils.isBlank(userDto.getPassword())) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "密码不能为空");
         }
+
         //判断是否存在该用户
         QueryWrapper<UserEntity> userEntityQueryWrapper = new QueryWrapper<>();
         userEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
@@ -62,6 +60,13 @@ public class UserLoginServiceImpl implements UserLoginService {
         if (userEntity == null) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "该用户不存在");
         }
+        if (userDto.getIsAdmin().equals(1)) {
+            List<UserRoleEntity> userRoleEntities = userMapper.checkLoginRole(Constant.ROLE_ADMIN, Constant.ROLE_MANANGER);
+            if (userRoleEntities.size() == 0 || !userRoleEntities.stream().map(o -> o.getUserId()).collect(Collectors.toList()).contains(userEntity.getId())) {
+                throw new EducationException(ResultCode.FAILER_CODE.getCode(), "没有登录角色权限");
+            }
+        }
+
         if (userEntity.getEnabled().equals(1)) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "账号已锁定，请联系管理员");
         }
@@ -93,7 +98,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 //            response.setHeader("Access-control-Expose-Headers", "Authorization");
             return Result.success().data("token", token);
         } else {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "密码错误");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "用户名或密码错误");
         }
     }
 

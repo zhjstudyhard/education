@@ -20,4 +20,11 @@
         </if>
         order by gmt_create DESC
     </select>
+    <select id="checkLoginRole" resultType="com.education.entity.system.UserRoleEntity">
+        select
+        bur.*
+        from b_userrole bur
+        inner join b_role br on br.id = bur.role_id
+        where bur.is_deleted = 0 and (br.role_code = #{roleAdmin} or br.role_code = #{roleMananger})
+    </select>
 </mapper>

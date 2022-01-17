@@ -68,6 +68,11 @@ public class UserDto {
     @NotBlank(message = "请上传文件",groups = {updateAvater.class})
     private String fileId;
 
+    /**
+     * 是否管理员登录(0:否，1:是)
+     */
+    private Integer isAdmin = 0;
+
     public String getId() {
         return id;
     }
@@ -162,6 +167,14 @@ public class UserDto {
 
     public void setFileId(String fileId) {
         this.fileId = fileId;
+    }
+
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
     }
 
     public interface updateAvater{

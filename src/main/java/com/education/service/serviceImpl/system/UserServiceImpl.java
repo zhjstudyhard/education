@@ -122,6 +122,13 @@ public class UserServiceImpl implements UserService {
             //更信任信息
             EntityUtil.addModifyInfo(userRoleEntity);
             userRoleMapper.updateById(userRoleEntity);
+        }else {
+            UserRoleEntity userRoleEntity1 = new UserRoleEntity();
+            userRoleEntity1.setUserId(userEntityLocal.getId());
+            userRoleEntity1.setRoleId(userDto.getRoleId());
+            EntityUtil.addCreateInfo(userRoleEntity1);
+
+            userRoleMapper.insert(userRoleEntity1);
         }
     }
 

@@ -34,5 +34,8 @@ public class Constant {
     public final static String ARTICLE_INDEX = "article";
     //普通用户角色
     public final static String ROLE_USER = "user";
-
+    //超级管理员角色
+    public final static String ROLE_ADMIN = "admin";
+    //普通管理员角色
+    public final static String ROLE_MANANGER = "mananger";
 }
