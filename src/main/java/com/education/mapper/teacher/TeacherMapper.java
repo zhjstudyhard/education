@@ -1,9 +1,13 @@
 package com.education.mapper.teacher;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.education.dto.teacher.TeacherDto;
 import com.education.entity.teacher.TeacherEntity;
+import com.education.vo.TeacherVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +21,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TeacherMapper extends BaseMapper<TeacherEntity> {
 
+    List<TeacherVo> pageListTeacher(TeacherDto teacherDto);
 }

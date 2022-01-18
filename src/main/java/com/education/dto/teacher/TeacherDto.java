@@ -1,6 +1,7 @@
 package com.education.dto.teacher;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Date;
 
 /**
  * @Author: haojie
@@ -10,6 +11,14 @@ import javax.validation.constraints.NotBlank;
 public class TeacherDto {
 
     private String id;
+    /**
+     * 当前页
+     */
+    private Integer currentPage = 1;
+    /**
+     * 每页显示的数量
+     */
+    private Integer pageSize = 10;
     /**
      * 讲师姓名
      */
@@ -37,7 +46,6 @@ public class TeacherDto {
     /**
      * "讲师头像"
      */
-//    @NotBlank(message = "讲师头像不能为空",groups = {updateAvater.class})
     private String avatar;
 
     /**
@@ -48,6 +56,15 @@ public class TeacherDto {
      * "排序"
      */
     private Integer sort;
+
+    /**
+     * 开始时间
+     */
+    private Date queryStartTime;
+    /**
+     * 结束时间
+     */
+    private Date queryEndTime;
 
     public String getId() {
         return id;
@@ -111,6 +128,38 @@ public class TeacherDto {
 
     public void setFileId(String fileId) {
         this.fileId = fileId;
+    }
+
+    public Integer getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Date getQueryStartTime() {
+        return queryStartTime;
+    }
+
+    public void setQueryStartTime(Date queryStartTime) {
+        this.queryStartTime = queryStartTime;
+    }
+
+    public Date getQueryEndTime() {
+        return queryEndTime;
+    }
+
+    public void setQueryEndTime(Date queryEndTime) {
+        this.queryEndTime = queryEndTime;
     }
 
     public interface updateAvater{
