@@ -41,6 +41,7 @@ public class SecurityBean {
      */
     public static String filePathUrl;
 
+
     @Value("${security.refreshTokenExpireTime}")
     private void setRefreshTokenExpireTime(String refreshTokenExpireTime) {
         SecurityBean.refreshTokenExpireTime = refreshTokenExpireTime;

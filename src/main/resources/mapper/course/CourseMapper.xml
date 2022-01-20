@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.course.CourseMapper">
+
+    <select id="findByCourseId" resultType="com.education.vo.CourseVO">
+        SELECT
+        c.id,
+        c.title,
+        c.lesson_num,
+        c.cover,
+        c.subject_id,
+        c.subject_parent_id,
+        c.teacher_id,
+        d.description
+        FROM
+        b_course c
+        LEFT JOIN b_course_description d ON c.id = d.course_id
+        WHERE
+        c.id = #{id}
+    </select>
+</mapper>

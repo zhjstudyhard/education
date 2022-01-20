@@ -1,18 +1,13 @@
 package com.education.controller.teacher;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.education.common.Result;
-import com.education.dto.system.UserDto;
 import com.education.dto.teacher.TeacherDto;
+import com.education.entity.teacher.TeacherEntity;
 import com.education.service.teacher.TeacherService;
-import com.education.vo.TeacherVo;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
 import java.util.List;
 
 
@@ -25,18 +20,19 @@ public class TeacherController {
     private TeacherService teacherService;
 
 
-//    /**
-//     * @return com.atjubai.commonutils.Result
-//     * @description 所有讲师列表
-//     * @author 橘白
-//     * @date 2021/8/12 17:09
-//     */
-//    @GetMapping("/findAll")
-//    public Result findAllTeacher() {
-//        List<EduTeacher> list = teacherService.list(null);
-//        return Result.success().data("items", list);
-//    }
-//
+    /**
+     * @return com.education.common.Result
+     * @description 所有讲师列表
+     * @author 橘白
+     * @date 2022/1/20 15:32
+     */
+
+    @PostMapping("/findAll")
+    public Result findAllTeacher() {
+        List<TeacherEntity> list = teacherService.list(null);
+        return Result.success().data("data", list);
+    }
+
 
     /**
      * @param teacherDto
@@ -78,7 +74,6 @@ public class TeacherController {
         teacherService.addTeacher(teacherDto);
         return Result.success();
     }
-
 
 
     /**
