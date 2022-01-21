@@ -1,23 +1,38 @@
 package com.education.vo;
 
 
+import java.util.Date;
+
 /**
  * @author jubai
  */
 public class CourseVO {
+    private String id;
 
     /**
      * 课程讲师ID
      */
     private String teacherId;
     /**
+     * 课程讲师姓名
+     */
+    private String teacherName;
+    /**
      * 课程专业ID
      */
     private String subjectId;
     /**
+     * 分类中文名
+     */
+    private String subjectName;
+    /**
      * 一级分类ID
      */
     private String subjectParentId;
+    /**
+     * 一级分类中文名
+     */
+    private String subjectParentName;
     /**
      * 课程标题
      */
@@ -42,9 +57,17 @@ public class CourseVO {
      */
     private String status;
     /**
+     * 课程状态中文名Draft未发布  Normal已发布
+     */
+    private String statusName;
+    /**
      * 课程描述
      */
     private String description;
+    /**
+     * 课程添加时间
+     */
+    private Date gmtCreate;
 
     public String getTeacherId() {
         return teacherId;
@@ -117,5 +140,53 @@ public class CourseVO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
+
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+
+    public String getSubjectParentName() {
+        return subjectParentName;
+    }
+
+    public void setSubjectParentName(String subjectParentName) {
+        this.subjectParentName = subjectParentName;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public Date getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public void setGmtCreate(Date gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

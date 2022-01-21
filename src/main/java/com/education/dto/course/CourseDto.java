@@ -12,6 +12,14 @@ public class CourseDto {
      */
     private String id;
     /**
+     * 当前页
+     */
+    private Integer currentPage = 1;
+    /**
+     * 每页显示的数量
+     */
+    private Integer pageSize = 10;
+    /**
      * 课程讲师ID
      */
     @NotBlank(message = "请选择讲师")
@@ -47,6 +55,10 @@ public class CourseDto {
      */
     @NotBlank(message = "请填写课程简介")
     private String description;
+    /**
+     * 课程发布状态
+     */
+    private String status;
 
     public String getId() {
         return id;
@@ -110,5 +122,29 @@ public class CourseDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

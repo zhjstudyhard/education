@@ -84,12 +84,18 @@ public class ChapterController {
 
         return Result.success();
     }
-//
-//    @ApiOperation(value = "删除大纲")
-//    @DeleteMapping("{chapterId}")
-//    public Result deleteChapter(@PathVariable String chapterId){
-//        educationChapterService.deleteById(chapterId);
-//        return Result.success();
-//    }
+
+    /**
+     * @param chapterDto
+     * @return com.education.common.Result
+     * @description 根据id删除章节
+     * @author 橘白
+     * @date 2022/1/21 19:43
+     */
+    @PostMapping("deleteChapterById")
+    public Result deleteChapterById(@RequestBody ChapterDto chapterDto) {
+        chapterService.deleteChapterById(chapterDto);
+        return Result.success();
+    }
 }
 

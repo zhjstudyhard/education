@@ -1,10 +1,15 @@
 package com.education.entity.course;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.education.entity.base.BaseEntity;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * @author 橘白
  */
+@TableName(value = "b_video")
 public class VideoEntity extends BaseEntity {
 
     /**
@@ -19,6 +24,7 @@ public class VideoEntity extends BaseEntity {
     /**
      * 节点名称
      */
+    @NotBlank(message = "标题不能为空")
     private String title;
     /**
      * 云端视频资源
@@ -32,6 +38,7 @@ public class VideoEntity extends BaseEntity {
     /**
      * 排序字段
      */
+    @NotEmpty(message = "请选择排序")
     private Integer sort;
     /**
      * 播放次数

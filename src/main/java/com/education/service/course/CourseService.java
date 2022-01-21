@@ -27,16 +27,13 @@ public interface CourseService extends IService<CourseEntity> {
     Result findByCourseId(CourseDto courseDto);
 
     void updateCourse(CourseDto courseDto);
-//
-//    /**
-//     * @param id
-//     * @return com.atjubai.eduservice.vo.CoursePublishVo
-//     * @description 根据id查询发布课程信息
-//     * @author 橘白
-//     * @date 2021/8/16 16:13
-//     */
-//
-//    CoursePublishVo getPublishCourseById(String id);
+
+    Result getPublishCourseById(CourseDto courseDto);
+
+    void publishCourse(CourseDto courseDto);
+
+    Result pageListCourse(CourseDto courseDto);
+
 //
 //    /**
 //     * @param id

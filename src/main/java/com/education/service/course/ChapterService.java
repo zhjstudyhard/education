@@ -34,13 +34,7 @@ public interface ChapterService extends IService<ChapterEntity> {
     Result getChapter(ChapterDto chapterDto);
 
     void updateChapter(ChapterDto chapterDto);
-//
-//    /**
-//     * @param chapterId
-//     * @description 根据课程章节id删除
-//     * @author 橘白
-//     * @date 2021/8/16 13:39
-//     */
-//
-//    void deleteById(String chapterId);
+
+    void deleteChapterById(ChapterDto chapterDto);
+
 }

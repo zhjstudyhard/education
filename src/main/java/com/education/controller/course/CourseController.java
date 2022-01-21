@@ -31,7 +31,6 @@ public class CourseController {
     private CourseService courseService;
 
 
-
     /**
      * @param courseDto
      * @return com.education.common.Result
@@ -74,53 +73,48 @@ public class CourseController {
 
         return Result.success();
     }
-//
-//    /**
-//     * @return com.atjubai.commonutils.Result
-//     * @description 查询当前发布信息
-//     * @author 橘白
-//     * @date 2021/8/16 16:06
-//     */
-//
-//    @ApiOperation(value = "根据id查询发布课程信息")
-//    @GetMapping("/getPublishCourseById/{courseId}")
-//    public Result getPublishCourseById(@PathVariable String courseId) {
-//        CoursePublishVo coursePublishVo = courseService.getPublishCourseById(courseId);
-//        return Result.success().data("publishCourse",coursePublishVo);
-//    }
-//
-//    @ApiOperation(value = "发布课程最终状态")
-//    @PostMapping("publishCourse/{id}")
-//    public Result getPublishCourse(@PathVariable String id){
-//        EduCourse eduCourse = new EduCourse();
-//        eduCourse.setId(id);
-//        eduCourse.setStatus("Normal");
-//        boolean flag = courseService.updateById(eduCourse);
-//        if (!flag) {
-//            throw new GuliException(ResultCode.FAILER_CODE.getCode(),"发布课程失败");
-//        }
-//        return Result.success();
-//    }
-//
-//
-//    @ApiOperation(value = "课程分页查询")
-//    @PostMapping("pageListCourse/{current}/{limit}")
-//    public Result pageListCourse(@ApiParam(name = "current", value = "当前页码", required = true) @PathVariable Long current,
-//                                 @ApiParam(name = "limit", value = "每页数量", required = true) @PathVariable Long limit,
-//                                 @RequestBody QueryCourseDto courseQuery) {
-//        System.out.println("queryCourseDto: "+courseQuery);
-//        QueryWrapper<EduCourse> queryWrapper = new QueryWrapper<>();
-//        if (!StringUtils.isEmpty(courseQuery.getTitle())){
-//            queryWrapper.like("title",courseQuery.getTitle());
-//        }
-//        if (!StringUtils.isEmpty(courseQuery.getStatus())){
-//            queryWrapper.eq("status", courseQuery.getStatus());
-//        }
-//        queryWrapper.orderByDesc("gmt_create");
-//        Page<EduCourse> page = new Page<>(current, limit);
-//        courseService.page(page,queryWrapper);
-//        return Result.success().data("pageInfo",page);
-//    }
+
+    /**
+     * @param courseDto
+     * @return com.education.common.Result
+     * @description 查询当前发布信息
+     * @author 橘白
+     * @date 2022/1/21 20:17
+     */
+
+    @PostMapping("/getPublishCourseById")
+    public Result getPublishCourseById(@RequestBody CourseDto courseDto) {
+        return courseService.getPublishCourseById(courseDto);
+    }
+
+    /**
+     * @param courseDto
+     * @return com.education.common.Result
+     * @description 发布课程最终状态
+     * @author 橘白
+     * @date 2022/1/21 20:17
+     */
+
+    @PostMapping("publishCourse")
+    public Result publishCourse(@RequestBody CourseDto courseDto) {
+        courseService.publishCourse(courseDto);
+        return Result.success();
+    }
+
+
+    /**
+     * @param courseDto
+     * @return com.education.common.Result
+     * @description 课程分页查询
+     * @author 橘白
+     * @date 2022/1/21 20:38
+     */
+
+    @PostMapping("pageListCourse")
+    public Result pageListCourse(@RequestBody CourseDto courseDto) {
+
+        return courseService.pageListCourse(courseDto);
+    }
 //
 //    @ApiOperation(value = "根据id删除课程")
 //    @DeleteMapping("{id}")

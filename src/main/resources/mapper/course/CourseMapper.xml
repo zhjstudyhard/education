@@ -14,8 +14,40 @@
         d.description
         FROM
         b_course c
-        LEFT JOIN b_course_description d ON c.id = d.course_id
+        LEFT JOIN b_course_description d ON c.id = d.course_id and d.is_deleted = 0
         WHERE
         c.id = #{id}
+    </select>
+    <select id="getPublishCourseById" resultType="com.education.vo.CourseVO">
+        SELECT
+        c.id,
+        c.title,
+        c.lesson_num,
+        c.cover,
+        s.title as subjectName,
+        s2.title as subjectParentName,
+        t.name as teacherName,
+        d.description
+        FROM
+        b_course c
+        LEFT JOIN b_course_description d ON c.id = d.course_id and d.is_deleted = 0
+        left join b_subject s on c.subject_id = s.id and s.is_deleted = 0
+        left join b_subject s2 on c.subject_parent_id = s2.id and s2.is_deleted = 0
+        left join b_teacher t on t.id =  c.teacher_id and t.is_deleted = 0
+        WHERE
+        c.id = #{id}
+    </select>
+    <select id="pageListCourse" resultType="com.education.vo.CourseVO">
+        SELECT
+        *
+        FROM
+        b_course
+        where is_deleted = 0
+        <if test="title != null and title != ''">
+          and title like concat('%',#{title},'%')
+        </if>
+        <if test="status != null and status != ''">
+            and status = #{status}
+        </if>
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.education.vo;
 
+import com.education.entity.course.VideoEntity;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class ChapterVo {
     private String title;
 
     //表示小节
-//    private List<VideoVo> children = new ArrayList<>();
+    private List<VideoEntity> children = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -31,5 +32,13 @@ public class ChapterVo {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public List<VideoEntity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<VideoEntity> children) {
+        this.children = children;
     }
 }

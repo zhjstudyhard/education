@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.education.common.Result;
 import com.education.common.ResultCode;
+import com.education.config.GlobalData;
 import com.education.constant.Constant;
+import com.education.dto.base.ResponsePageDto;
 import com.education.dto.course.CourseDto;
 import com.education.entity.course.CourseDescriptionEntity;
 import com.education.entity.course.CourseEntity;
@@ -15,10 +17,15 @@ import com.education.mapper.course.CourseMapper;
 import com.education.service.course.CourseService;
 import com.education.util.EntityUtil;
 import com.education.vo.CourseVO;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 /**
@@ -98,20 +105,46 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
         courseDescriptionMapper.updateById(courseDescriptionEntity);
     }
 
+    @Override
+    public Result getPublishCourseById(CourseDto courseDto) {
+        if (courseDto.getId() == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不能为空");
+        }
+        CourseEntity courseEntity = courseMapper.selectById(courseDto.getId());
+        if (courseEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
+        }
+        CourseVO courseVO = courseMapper.getPublishCourseById(courseDto.getId());
+        return Result.success().data("data",courseVO);
+    }
+
+    @Override
+    public void publishCourse(CourseDto courseDto) {
+        if (courseDto.getId() == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不能为空");
+        }
+        CourseEntity courseEntity = courseMapper.selectById(courseDto.getId());
+        if (courseEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
+        }
+        courseEntity.setStatus("Normal");
+        EntityUtil.addModifyInfo(courseEntity);
+
+        courseMapper.updateById(courseEntity);
+    }
+
+    @Override
+    public Result pageListCourse(CourseDto courseDto) {
+        PageHelper.startPage(courseDto.getCurrentPage(), courseDto.getPageSize());
+        List<CourseVO> list = courseMapper.pageListCourse(courseDto);
+        for (CourseVO courseVO : list) {
+            courseVO.setStatusName(GlobalData.dictMap.get(courseVO.getStatus()).getDictionaryValue());
+        }
+        PageInfo<CourseVO> courseVOPageInfo = new PageInfo<>(list);
+        return Result.success().data("data",new ResponsePageDto<>(courseVOPageInfo.getList(),courseVOPageInfo.getTotal(),courseVOPageInfo.getPages(),courseVOPageInfo.getPageNum()));
+    }
+
     //
-//    /**
-//     * @param id
-//     * @return com.atjubai.eduservice.vo.CoursePublishVo
-//     * @description 根据id查询发布课程信息
-//     * @author 橘白
-//     * @date 2021/8/16 16:13
-//     */
-//    @Override
-//    public CoursePublishVo getPublishCourseById(String id) {
-//        CoursePublishVo coursePublishVo = courseMapper.getPublishCourseById(id);
-//        return coursePublishVo;
-//    }
-//
 //    /**
 //     * @param id
 //     * @return java.lang.Integer
