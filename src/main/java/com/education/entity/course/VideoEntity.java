@@ -5,6 +5,7 @@ import com.education.entity.base.BaseEntity;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author 橘白
@@ -38,7 +39,7 @@ public class VideoEntity extends BaseEntity {
     /**
      * 排序字段
      */
-    @NotEmpty(message = "请选择排序")
+    @NotNull(message = "请选择排序")
     private Integer sort;
     /**
      * 播放次数

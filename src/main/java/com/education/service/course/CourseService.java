@@ -34,14 +34,6 @@ public interface CourseService extends IService<CourseEntity> {
 
     Result pageListCourse(CourseDto courseDto);
 
-//
-//    /**
-//     * @param id
-//     * @return java.lang.Integer
-//     * @description 删除课程
-//     * @author 橘白
-//     * @date 2021/8/17 9:16
-//     */
-//
-//    Integer removeCourseById(String id);
+
+    void removeCourseById(CourseDto courseDto);
 }

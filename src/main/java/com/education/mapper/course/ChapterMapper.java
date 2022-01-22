@@ -5,6 +5,8 @@ import com.education.entity.course.ChapterEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * <p>
  * 课程 Mapper 接口
@@ -17,4 +19,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChapterMapper extends BaseMapper<ChapterEntity> {
 
+    void deleteChapterBatch(List<String> chapterIds);
 }

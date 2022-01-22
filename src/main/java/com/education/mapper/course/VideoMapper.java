@@ -5,6 +5,8 @@ import com.education.entity.course.VideoEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * <p>
  * 课程视频 Mapper 接口
@@ -17,4 +19,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VideoMapper extends BaseMapper<VideoEntity> {
 
+    void deleteVideoBatchIds(List<String> videoIds);
 }

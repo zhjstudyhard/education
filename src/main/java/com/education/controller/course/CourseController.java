@@ -115,15 +115,19 @@ public class CourseController {
 
         return courseService.pageListCourse(courseDto);
     }
-//
-//    @ApiOperation(value = "根据id删除课程")
-//    @DeleteMapping("{id}")
-//    public Result removeCourseById(@PathVariable String id){
-//        Integer integer = courseService.removeCourseById(id);
-//        if(integer > 0){
-//            return Result.success();
-//        }
-//        return Result.fail();
-//    }
+
+    /**
+     * @param courseDto
+     * @return com.education.common.Result
+     * @description 根据id删除课程
+     * @author 橘白
+     * @date 2022/1/22 14:54
+     */
+
+    @PostMapping("removeCourseById")
+    public Result removeCourseById(@RequestBody CourseDto courseDto) {
+        courseService.removeCourseById(courseDto);
+        return Result.success();
+    }
 }
 

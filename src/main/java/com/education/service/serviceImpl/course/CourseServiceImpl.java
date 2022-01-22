@@ -1,30 +1,40 @@
 package com.education.service.serviceImpl.course;
 
 
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.education.common.Result;
 import com.education.common.ResultCode;
 import com.education.config.GlobalData;
+import com.education.config.OssConfig;
 import com.education.constant.Constant;
 import com.education.dto.base.ResponsePageDto;
 import com.education.dto.course.CourseDto;
+import com.education.entity.course.ChapterEntity;
 import com.education.entity.course.CourseDescriptionEntity;
 import com.education.entity.course.CourseEntity;
+import com.education.entity.course.VideoEntity;
 import com.education.exceptionhandler.EducationException;
+import com.education.mapper.course.ChapterMapper;
 import com.education.mapper.course.CourseDescriptionMapper;
 import com.education.mapper.course.CourseMapper;
+import com.education.mapper.course.VideoMapper;
 import com.education.service.course.CourseService;
+import com.education.service.course.VideoService;
 import com.education.util.EntityUtil;
 import com.education.vo.CourseVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -45,6 +55,16 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
 
     @Autowired
     private CourseDescriptionMapper courseDescriptionMapper;
+
+    @Autowired
+    private VideoMapper videoMapper;
+
+    @Autowired
+    private VideoService videoService;
+
+    @Autowired
+    private ChapterMapper chapterMapper;
+
 
 
     @Override
@@ -144,81 +164,98 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
         return Result.success().data("data",new ResponsePageDto<>(courseVOPageInfo.getList(),courseVOPageInfo.getTotal(),courseVOPageInfo.getPages(),courseVOPageInfo.getPageNum()));
     }
 
-    //
-//    /**
-//     * @param id
-//     * @return java.lang.Integer
-//     * @description 删除课程
-//     * @author 橘白
-//     * @date 2021/8/17 9:16
-//     */
-//    @Transactional(rollbackFor = Exception.class)
-//    @Override
-//    public Integer removeCourseById(String id) {
-//        EduCourse eduCourse = courseMapper.selectById(id);
-//        if (eduCourse == null) {
-//            throw new GuliException(ResultCode.FAILER_CODE.getCode(), "课程不存在");
-//        }
-//        //查询所有视频源id
-//        ArrayList<String> list = new ArrayList<>();
-//        QueryWrapper<EduVideo> eduVideoQueryWrapper = new QueryWrapper<>();
-//        eduVideoQueryWrapper.eq("course_id", id);
-//        List<EduVideo> eduVideos = eduVideoMapper.selectList(eduVideoQueryWrapper);
-//        for (EduVideo eduVideo : eduVideos) {
-//            if (!StringUtils.isEmpty(eduVideo.getVideoSourceId())) {
-//                list.add(eduVideo.getVideoSourceId());
-//            }
-//        }
-//        //批量删除阿里云视频
-//        if (list.size() > 0) {
-//            Result result = vodClient.deleteBatch(list);
-//            System.out.println("result: "+result);
-//        }
-//        //删除课程视频小节
-//        eduVideoService.remove(eduVideoQueryWrapper);
-//        //删除课程大纲
-//        QueryWrapper<EduChapter> eduChapterQueryWrapper = new QueryWrapper<>();
-//        eduChapterQueryWrapper.eq("course_id", id);
-//        eduChapterService.remove(eduChapterQueryWrapper);
-//        //删除课程内容
-//        eduCourseDescriptionService.removeById(id);
-//        //删除课程
-//        int i = courseMapper.deleteById(id);
-//
-//        //删除oss图片
-//        String url = eduCourse.getCover();
-//        this.removeFile(url);
-//        return i;
-//    }
-//
-//    //删除图片
-//    public void removeFile(String url) {
-//        try {
-//            // Endpoint
-//            String endpoint = "https://oss-cn-hangzhou.aliyuncs.com";
-//            // keyId
-//            String accessKeyId = "LTAI5tAUqSobwA3iSJahrvEK";
-//            // KeySecret
-//            String accessKeySecret = "zul8WPqOuZHXA2U3DMx5zlBs8CtvQ6";
-//            // 第一个文件夹
-//            String bucketName = "edu-firstly";
-//            //文件路径
-//            String fileNameUrl = endpoint.replace("//", "//" + bucketName + ".");
-//            fileNameUrl = url.substring(fileNameUrl.length() + 1);
-//            // 创建OSSClient实例。
-//            OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-//            // 判断当前文件url 是否存在
-//            boolean exist = ossClient.doesObjectExist(bucketName, fileNameUrl);
-//            if (!exist) {
-//                throw new GuliException(ResultCode.FAILER_CODE.getCode(), "文件不存在");
-//            } else {
-//                // 删除文件。
-//                ossClient.deleteObject(bucketName, fileNameUrl);
-//                // 关闭OSSClient。
-//                ossClient.shutdown();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    @Override
+    public void removeCourseById(CourseDto courseDto) {
+        CourseEntity courseEntity = courseMapper.selectById(courseDto.getId());
+        if (courseEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "课程不存在");
+        }
+        //查询所有视频源id
+        List<String> videoSourceIds = new ArrayList<>();
+        List<String> videoIds = new ArrayList<>();
+        QueryWrapper<VideoEntity> eduVideoQueryWrapper = new QueryWrapper<>();
+        eduVideoQueryWrapper.eq("course_id", courseDto.getId())
+                .eq("is_deleted",Constant.ISDELETED_FALSE);
+        List<VideoEntity> eduVideos = videoMapper.selectList(eduVideoQueryWrapper);
+        for (VideoEntity videoEntity : eduVideos) {
+            if (StringUtils.isNotBlank(videoEntity.getVideoSourceId())) {
+                videoSourceIds.add(videoEntity.getVideoSourceId());
+            }
+            videoIds.add(videoEntity.getId());
+        }
+        //批量删除阿里云视频
+        if (videoSourceIds.size() > 0) {
+            videoService.removeMoreAlyVideo(videoSourceIds);
+        }
+        //删除课程视频小节
+        if (videoIds.size() > 0){
+            videoMapper.deleteVideoBatchIds(videoIds);
+        }
+        //删除课程大纲
+        List<String> chapterIds = new ArrayList<>();
+        QueryWrapper<ChapterEntity> eduChapterQueryWrapper = new QueryWrapper<>();
+        eduChapterQueryWrapper.eq("course_id", courseDto.getId())
+                .eq("is_deleted",Constant.ISDELETED_FALSE);
+        List<ChapterEntity> chapterEntities = chapterMapper.selectList(eduChapterQueryWrapper);
+        for (ChapterEntity chapterEntity : chapterEntities){
+            chapterIds.add(chapterEntity.getId());
+        }
+        if (chapterIds.size() > 0){
+            chapterMapper.deleteChapterBatch(chapterIds);
+        }
+        //删除课程内容
+        QueryWrapper<CourseDescriptionEntity> courseDescriptionEntityQueryWrapper = new QueryWrapper<>();
+        courseDescriptionEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
+                .eq("course_id",courseDto.getId());
+        CourseDescriptionEntity courseDescriptionEntity = courseDescriptionMapper.selectOne(courseDescriptionEntityQueryWrapper);
+        if (courseDescriptionEntity != null){
+            courseDescriptionEntity.setIsDeleted(Constant.ISDELETED_TRUE);
+            EntityUtil.addModifyInfo(courseDescriptionEntity);
+
+            courseDescriptionMapper.updateById(courseDescriptionEntity);
+        }
+        //删除课程
+        courseEntity.setIsDeleted(Constant.ISDELETED_TRUE);
+        EntityUtil.addModifyInfo(courseEntity);
+
+        courseMapper.updateById(courseEntity);
+
+        //删除oss图片
+        String url = courseEntity.getCover();
+        if (StringUtils.isNotBlank(url)){
+            this.removeFile(url);
+        }
+
+    }
+
+    //删除图片
+    public void removeFile(String url) {
+        try {
+            // Endpoint
+            String endpoint = OssConfig.END_POIND;
+            // keyId
+            String accessKeyId = OssConfig.ACCESS_KEY_ID;
+            // KeySecret
+            String accessKeySecret = OssConfig.ACCESS_KEY_SECRET;
+            // 第一个文件夹
+            String bucketName = OssConfig.BUCKET_NAME;
+            //文件路径
+            String fileNameUrl = endpoint.replace("//", "//" + bucketName + ".");
+            fileNameUrl = url.substring(fileNameUrl.length() + 1);
+            // 创建OSSClient实例。
+            OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+            // 判断当前文件url 是否存在
+            boolean exist = ossClient.doesObjectExist(bucketName, fileNameUrl);
+            if (!exist) {
+                throw new EducationException(ResultCode.FAILER_CODE.getCode(), "文件不存在");
+            } else {
+                // 删除文件。
+                ossClient.deleteObject(bucketName, fileNameUrl);
+                // 关闭OSSClient。
+                ossClient.shutdown();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
