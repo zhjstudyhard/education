@@ -16,11 +16,13 @@ import com.education.entity.course.ChapterEntity;
 import com.education.entity.course.CourseDescriptionEntity;
 import com.education.entity.course.CourseEntity;
 import com.education.entity.course.VideoEntity;
+import com.education.entity.teacher.TeacherEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.course.ChapterMapper;
 import com.education.mapper.course.CourseDescriptionMapper;
 import com.education.mapper.course.CourseMapper;
 import com.education.mapper.course.VideoMapper;
+import com.education.mapper.teacher.TeacherMapper;
 import com.education.service.course.CourseService;
 import com.education.service.course.VideoService;
 import com.education.util.EntityUtil;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -64,6 +67,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
 
     @Autowired
     private ChapterMapper chapterMapper;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
 
 
 
@@ -257,5 +263,17 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Result indexData() {
+        //查询前八条课程
+        List<CourseEntity> courses = courseMapper.selectCourses();
+        //查询讲师
+        List<TeacherEntity> teachers = teacherMapper.selectTeachers();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("eduList",courses);
+        map.put("teacherList",teachers);
+        return Result.success().data(map);
     }
 }

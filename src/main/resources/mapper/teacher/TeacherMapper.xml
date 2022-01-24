@@ -19,4 +19,9 @@
         </if>
         order by gmt_create,sort
     </select>
+    <select id="selectTeachers" resultType="com.education.entity.teacher.TeacherEntity">
+        select * from b_teacher where is_deleted = 0
+        order by gmt_create DESC
+        limit 8
+    </select>
 </mapper>

@@ -36,4 +36,7 @@ public interface CourseService extends IService<CourseEntity> {
 
 
     void removeCourseById(CourseDto courseDto);
+
+
+    Result indexData();
 }

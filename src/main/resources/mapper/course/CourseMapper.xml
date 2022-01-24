@@ -50,4 +50,9 @@
             and status = #{status}
         </if>
     </select>
+    <select id="selectCourses" resultType="com.education.entity.course.CourseEntity">
+        select * from b_course where is_deleted = 0
+        order by view_count
+        limit 8
+    </select>
 </mapper>

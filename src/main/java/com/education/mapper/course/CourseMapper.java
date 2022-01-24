@@ -28,4 +28,6 @@ public interface CourseMapper extends BaseMapper<CourseEntity> {
     CourseVO getPublishCourseById(String id);
 
     List<CourseVO> pageListCourse(CourseDto courseDto);
+
+    List<CourseEntity> selectCourses();
 }

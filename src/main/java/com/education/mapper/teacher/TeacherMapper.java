@@ -22,4 +22,6 @@ import java.util.List;
 public interface TeacherMapper extends BaseMapper<TeacherEntity> {
 
     List<TeacherVo> pageListTeacher(TeacherDto teacherDto);
+
+    List<TeacherEntity> selectTeachers();
 }

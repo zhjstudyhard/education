@@ -129,5 +129,17 @@ public class CourseController {
         courseService.removeCourseById(courseDto);
         return Result.success();
     }
+
+    /**
+     * @return com.education.common.Result
+     * @description 首页查询数据
+     * @author 橘白
+     * @date 2022/1/24 17:10
+     */
+
+    @PostMapping("indexData")
+    public Result indexData() {
+        return courseService.indexData();
+    }
 }
 
