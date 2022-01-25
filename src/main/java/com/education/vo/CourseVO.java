@@ -2,6 +2,7 @@ package com.education.vo;
 
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author jubai
@@ -17,6 +18,15 @@ public class CourseVO {
      * 课程讲师姓名
      */
     private String teacherName;
+    /**
+     * 课程讲师头像
+     */
+    private  String teacherAvatar;
+
+    /**
+     * 课程讲师头衔
+     */
+    private  String career;
     /**
      * 课程专业ID
      */
@@ -68,6 +78,34 @@ public class CourseVO {
      * 课程添加时间
      */
     private Date gmtCreate;
+    /**
+     * 课程章节和小节
+     */
+    private List<ChapterVo> chapterVos;
+
+    public List<ChapterVo> getChapterVos() {
+        return chapterVos;
+    }
+
+    public void setChapterVos(List<ChapterVo> chapterVos) {
+        this.chapterVos = chapterVos;
+    }
+
+    public String getTeacherAvatar() {
+        return teacherAvatar;
+    }
+
+    public void setTeacherAvatar(String teacherAvatar) {
+        this.teacherAvatar = teacherAvatar;
+    }
+
+    public String getCareer() {
+        return career;
+    }
+
+    public void setCareer(String career) {
+        this.career = career;
+    }
 
     public String getTeacherId() {
         return teacherId;
@@ -189,4 +227,6 @@ public class CourseVO {
     public void setId(String id) {
         this.id = id;
     }
+
+
 }

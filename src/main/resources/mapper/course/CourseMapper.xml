@@ -11,10 +11,14 @@
         c.subject_id,
         c.subject_parent_id,
         c.teacher_id,
+        t.name as teacherName,
+        t.avatar as teacherAvatar,
+        t.career as career,
         d.description
         FROM
         b_course c
         LEFT JOIN b_course_description d ON c.id = d.course_id and d.is_deleted = 0
+        left join b_teacher t on t.id =  c.teacher_id and t.is_deleted = 0
         WHERE
         c.id = #{id}
     </select>
@@ -48,6 +52,12 @@
         </if>
         <if test="status != null and status != ''">
             and status = #{status}
+        </if>
+        <if test="subjectParentId != null and subjectParentId != ''">
+            and subject_parent_id = #{subjectParentId}
+        </if>
+        <if test="subjectId != null and subjectId != ''">
+            and subject_id = #{subjectId}
         </if>
     </select>
     <select id="selectCourses" resultType="com.education.entity.course.CourseEntity">

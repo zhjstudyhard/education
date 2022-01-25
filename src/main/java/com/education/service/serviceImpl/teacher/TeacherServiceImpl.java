@@ -7,9 +7,11 @@ import com.education.config.GlobalData;
 import com.education.constant.Constant;
 import com.education.dto.base.ResponsePageDto;
 import com.education.dto.teacher.TeacherDto;
+import com.education.entity.course.CourseEntity;
 import com.education.entity.teacher.TeacherEntity;
 import com.education.entity.uploadfile.UploadFileEntity;
 import com.education.exceptionhandler.EducationException;
+import com.education.mapper.course.CourseMapper;
 import com.education.mapper.teacher.TeacherMapper;
 import com.education.mapper.upload.UploadFileMapper;
 import com.education.service.teacher.TeacherService;
@@ -36,6 +38,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, TeacherEntity
 
     @Autowired
     private UploadFileMapper uploadFileMapper;
+
+    @Autowired
+    private CourseMapper courseMapper;
 
     @Override
     public void addTeacher(TeacherDto teacherDto) {
@@ -153,4 +158,28 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, TeacherEntity
 
     }
 
+    @Override
+    public Result getTeacherInfoIndexById(TeacherDto teacherDto) {
+        TeacherEntity teacherEntity = teacherMapper.selectById(teacherDto.getId());
+        if (teacherEntity == null){
+            throw new EducationException(Result.fail().getCode(),"数据不存在");
+        }
+        //属性赋值
+        TeacherVo teacherVo = new TeacherVo();
+        BeanUtils.copyProperties(teacherEntity,teacherVo);
+
+        if (StringUtils.isNotBlank(teacherVo.getLevel())){
+            teacherVo.setLevelName(GlobalData.dictMap.get(teacherVo.getLevel()).getDictionaryValue());
+        }
+        //查询当前讲师的课程
+        QueryWrapper<CourseEntity> courseEntityQueryWrapper = new QueryWrapper<>();
+        courseEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
+                .eq("teacher_id",teacherDto.getId());
+        courseEntityQueryWrapper.orderByAsc("gmt_create");
+
+        List<CourseEntity> courseEntities = courseMapper.selectList(courseEntityQueryWrapper);
+        teacherVo.setCourseList(courseEntities);
+
+        return Result.success().data("data",teacherVo);
+    }
 }

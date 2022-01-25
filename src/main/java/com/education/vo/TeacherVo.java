@@ -1,6 +1,10 @@
 package com.education.vo;
 
+import com.education.entity.course.CourseEntity;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: haojie
@@ -47,6 +51,10 @@ public class TeacherVo {
      * "排序"
      */
     private Integer sort;
+    /**
+     * 讲师下的课程
+     */
+    private List<CourseEntity> courseList = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -118,5 +126,13 @@ public class TeacherVo {
 
     public void setLevelName(String levelName) {
         this.levelName = levelName;
+    }
+
+    public List<CourseEntity> getCourseList() {
+        return courseList;
+    }
+
+    public void setCourseList(List<CourseEntity> courseList) {
+        this.courseList = courseList;
     }
 }

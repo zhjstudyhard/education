@@ -28,4 +28,6 @@ public interface TeacherService extends IService<TeacherEntity> {
     void deleteTeacherById(TeacherDto teacherDto);
 
     void updateTeacher(TeacherDto teacherDto);
+
+    Result getTeacherInfoIndexById(TeacherDto teacherDto);
 }

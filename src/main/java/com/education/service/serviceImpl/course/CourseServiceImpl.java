@@ -11,6 +11,7 @@ import com.education.config.GlobalData;
 import com.education.config.OssConfig;
 import com.education.constant.Constant;
 import com.education.dto.base.ResponsePageDto;
+import com.education.dto.course.ChapterDto;
 import com.education.dto.course.CourseDto;
 import com.education.entity.course.ChapterEntity;
 import com.education.entity.course.CourseDescriptionEntity;
@@ -23,9 +24,11 @@ import com.education.mapper.course.CourseDescriptionMapper;
 import com.education.mapper.course.CourseMapper;
 import com.education.mapper.course.VideoMapper;
 import com.education.mapper.teacher.TeacherMapper;
+import com.education.service.course.ChapterService;
 import com.education.service.course.CourseService;
 import com.education.service.course.VideoService;
 import com.education.util.EntityUtil;
+import com.education.vo.ChapterVo;
 import com.education.vo.CourseVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -71,6 +74,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
     @Autowired
     private TeacherMapper teacherMapper;
 
+    @Autowired
+    private ChapterService chapterService;
 
 
     @Override
@@ -110,6 +115,12 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "课程不存在");
         }
         CourseVO courseVO = courseMapper.findByCourseId(courseDto.getId());
+        //调用其它业务层查询课程章节和小节信息
+        ChapterDto chapterDto = new ChapterDto();
+        chapterDto.setCourseId(courseDto.getId());
+
+        Result result = chapterService.getChapterVideo(chapterDto);
+        courseVO.setChapterVos((List<ChapterVo>) result.getData().get("data"));
         return Result.success().data("data", courseVO);
     }
 
@@ -125,7 +136,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
         //更新课程描述信息
         QueryWrapper<CourseDescriptionEntity> courseDescriptionEntityQueryWrapper = new QueryWrapper<>();
         courseDescriptionEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
-                .eq("course_id",courseEntity.getId());
+                .eq("course_id", courseEntity.getId());
         CourseDescriptionEntity courseDescriptionEntity = courseDescriptionMapper.selectOne(courseDescriptionEntityQueryWrapper);
         courseDescriptionEntity.setDescription(courseDto.getDescription());
         courseDescriptionMapper.updateById(courseDescriptionEntity);
@@ -134,24 +145,24 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
     @Override
     public Result getPublishCourseById(CourseDto courseDto) {
         if (courseDto.getId() == null) {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不能为空");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
         }
         CourseEntity courseEntity = courseMapper.selectById(courseDto.getId());
         if (courseEntity == null) {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
         }
         CourseVO courseVO = courseMapper.getPublishCourseById(courseDto.getId());
-        return Result.success().data("data",courseVO);
+        return Result.success().data("data", courseVO);
     }
 
     @Override
     public void publishCourse(CourseDto courseDto) {
         if (courseDto.getId() == null) {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"主键不能为空");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
         }
         CourseEntity courseEntity = courseMapper.selectById(courseDto.getId());
         if (courseEntity == null) {
-            throw new EducationException(ResultCode.FAILER_CODE.getCode(),"数据不存在");
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "数据不存在");
         }
         courseEntity.setStatus("Normal");
         EntityUtil.addModifyInfo(courseEntity);
@@ -162,12 +173,15 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
     @Override
     public Result pageListCourse(CourseDto courseDto) {
         PageHelper.startPage(courseDto.getCurrentPage(), courseDto.getPageSize());
+        if (StringUtils.isNotBlank(courseDto.getSubjectParentId()) && courseDto.getSubjectParentId().equals(Constant.NUMBER_NEGATIVE_ONE)) {
+            courseDto.setSubjectParentId("");
+        }
         List<CourseVO> list = courseMapper.pageListCourse(courseDto);
         for (CourseVO courseVO : list) {
             courseVO.setStatusName(GlobalData.dictMap.get(courseVO.getStatus()).getDictionaryValue());
         }
         PageInfo<CourseVO> courseVOPageInfo = new PageInfo<>(list);
-        return Result.success().data("data",new ResponsePageDto<>(courseVOPageInfo.getList(),courseVOPageInfo.getTotal(),courseVOPageInfo.getPages(),courseVOPageInfo.getPageNum()));
+        return Result.success().data("data", new ResponsePageDto<>(courseVOPageInfo.getList(), courseVOPageInfo.getTotal(), courseVOPageInfo.getPages(), courseVOPageInfo.getPageNum()));
     }
 
     @Override
@@ -181,7 +195,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
         List<String> videoIds = new ArrayList<>();
         QueryWrapper<VideoEntity> eduVideoQueryWrapper = new QueryWrapper<>();
         eduVideoQueryWrapper.eq("course_id", courseDto.getId())
-                .eq("is_deleted",Constant.ISDELETED_FALSE);
+                .eq("is_deleted", Constant.ISDELETED_FALSE);
         List<VideoEntity> eduVideos = videoMapper.selectList(eduVideoQueryWrapper);
         for (VideoEntity videoEntity : eduVideos) {
             if (StringUtils.isNotBlank(videoEntity.getVideoSourceId())) {
@@ -194,27 +208,27 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
             videoService.removeMoreAlyVideo(videoSourceIds);
         }
         //删除课程视频小节
-        if (videoIds.size() > 0){
+        if (videoIds.size() > 0) {
             videoMapper.deleteVideoBatchIds(videoIds);
         }
         //删除课程大纲
         List<String> chapterIds = new ArrayList<>();
         QueryWrapper<ChapterEntity> eduChapterQueryWrapper = new QueryWrapper<>();
         eduChapterQueryWrapper.eq("course_id", courseDto.getId())
-                .eq("is_deleted",Constant.ISDELETED_FALSE);
+                .eq("is_deleted", Constant.ISDELETED_FALSE);
         List<ChapterEntity> chapterEntities = chapterMapper.selectList(eduChapterQueryWrapper);
-        for (ChapterEntity chapterEntity : chapterEntities){
+        for (ChapterEntity chapterEntity : chapterEntities) {
             chapterIds.add(chapterEntity.getId());
         }
-        if (chapterIds.size() > 0){
+        if (chapterIds.size() > 0) {
             chapterMapper.deleteChapterBatch(chapterIds);
         }
         //删除课程内容
         QueryWrapper<CourseDescriptionEntity> courseDescriptionEntityQueryWrapper = new QueryWrapper<>();
-        courseDescriptionEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
-                .eq("course_id",courseDto.getId());
+        courseDescriptionEntityQueryWrapper.eq("is_deleted", Constant.ISDELETED_FALSE)
+                .eq("course_id", courseDto.getId());
         CourseDescriptionEntity courseDescriptionEntity = courseDescriptionMapper.selectOne(courseDescriptionEntityQueryWrapper);
-        if (courseDescriptionEntity != null){
+        if (courseDescriptionEntity != null) {
             courseDescriptionEntity.setIsDeleted(Constant.ISDELETED_TRUE);
             EntityUtil.addModifyInfo(courseDescriptionEntity);
 
@@ -228,7 +242,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
 
         //删除oss图片
         String url = courseEntity.getCover();
-        if (StringUtils.isNotBlank(url)){
+        if (StringUtils.isNotBlank(url)) {
             this.removeFile(url);
         }
 
@@ -272,8 +286,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
         //查询讲师
         List<TeacherEntity> teachers = teacherMapper.selectTeachers();
         HashMap<String, Object> map = new HashMap<>();
-        map.put("eduList",courses);
-        map.put("teacherList",teachers);
+        map.put("eduList", courses);
+        map.put("teacherList", teachers);
         return Result.success().data(map);
     }
 }
