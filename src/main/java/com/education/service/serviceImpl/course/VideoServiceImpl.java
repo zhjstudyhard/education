@@ -4,14 +4,17 @@ import com.aliyun.vod.upload.impl.UploadVideoImpl;
 import com.aliyun.vod.upload.req.UploadStreamRequest;
 import com.aliyun.vod.upload.resp.UploadStreamResponse;
 import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.vod.model.v20170321.DeleteVideoRequest;
+import com.aliyuncs.vod.model.v20170321.*;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.education.common.Result;
 import com.education.common.ResultCode;
 import com.education.config.OssConfig;
 import com.education.constant.Constant;
+import com.education.entity.course.CourseEntity;
 import com.education.entity.course.VideoEntity;
 import com.education.exceptionhandler.EducationException;
+import com.education.mapper.course.CourseMapper;
 import com.education.mapper.course.VideoMapper;
 import com.education.service.course.VideoService;
 import com.education.util.EntityUtil;
@@ -29,6 +32,9 @@ import java.util.List;
 public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoEntity> implements VideoService {
     @Autowired
     private VideoMapper videoMapper;
+
+    @Autowired
+    private CourseMapper courseMapper;
 
     @Override
     public void addVideo(VideoEntity videoEntity) {
@@ -166,10 +172,44 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, VideoEntity> impl
             request.setVideoIds(id);
             //调用初始化对象的方法实现删除
             client.getAcsResponse(request);
-//            return Result.success();
         } catch (Exception e) {
             e.printStackTrace();
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "删除视频失败");
+        }
+    }
+
+    @Override
+    public Result getVideoPlayAuth(VideoEntity videoEntity) {
+        try {
+            //初始化对象
+            DefaultAcsClient client = InitVodCilent.initVodClient(OssConfig.ACCESS_KEY_ID, OssConfig.ACCESS_KEY_SECRET);
+            //创建视频凭证信息请求对象
+            GetVideoPlayAuthRequest request = new GetVideoPlayAuthRequest();
+            //创建视频凭证信息象映对象
+            GetVideoPlayAuthResponse response = new GetVideoPlayAuthResponse();
+            //设置视频资源id
+            request.setVideoId(videoEntity.getVideoSourceId());
+            //发起请求
+            response = client.getAcsResponse(request);
+            //更新视频浏览量
+            QueryWrapper<VideoEntity> videoEntityQueryWrapper = new QueryWrapper<>();
+            videoEntityQueryWrapper.eq("is_deleted",Constant.ISDELETED_FALSE)
+                    .eq("video_source_id",videoEntity.getVideoSourceId());
+            VideoEntity videoEntityLocal = videoMapper.selectOne(videoEntityQueryWrapper);
+
+            if (videoEntityLocal != null){
+                if (videoEntityLocal.getPlayCount() == null){
+                    videoEntityLocal.setPlayCount(new Long(1));
+                }else {
+                    videoEntityLocal.setPlayCount(videoEntityLocal.getPlayCount() + 1);
+                }
+
+                videoMapper.updateById(videoEntityLocal);
+            }
+            return Result.success().data("data",response.getPlayAuth());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "播放视频失败");
         }
     }
 }

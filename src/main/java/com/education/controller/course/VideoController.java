@@ -97,13 +97,33 @@ public class VideoController {
     }
 
 
-
+    /**
+     * @param videoEntity
+     * @return com.education.common.Result
+     * @description 删除阿里云视频
+     * @author 橘白
+     * @date 2022/1/26 16:35
+     */
 
     @PostMapping("deleteAliyunvod")
     public Result deleteAliyunvod(@RequestBody VideoEntity videoEntity) {
         //返回上传视频id
         videoService.deleteAliyunvod(videoEntity);
         return Result.success();
+    }
+
+    /**
+     * @param videoEntity
+     * @return com.education.common.Result
+     * @description 查看视频凭证信息
+     * @author 橘白
+     * @date 2022/1/26 16:37
+     */
+
+    @PostMapping("getVideoPlayAuth")
+    public Result getVideoPlayAuth(@RequestBody VideoEntity videoEntity) {
+        //返回视频凭证
+        return videoService.getVideoPlayAuth(videoEntity);
     }
 }
 

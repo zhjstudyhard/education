@@ -84,6 +84,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
         CourseEntity courseEntity = new CourseEntity();
         BeanUtils.copyProperties(courseDto, courseEntity);
         courseEntity.setStatus("Draft");
+        courseEntity.setViewCount(new Long(0));
         EntityUtil.addCreateInfo(courseEntity);
 
         int flag = courseMapper.insert(courseEntity);
@@ -121,6 +122,14 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
 
         Result result = chapterService.getChapterVideo(chapterDto);
         courseVO.setChapterVos((List<ChapterVo>) result.getData().get("data"));
+        //更新视频浏览量
+        if (courseEntity.getViewCount() == null) {
+            courseEntity.setViewCount(new Long(1));
+        } else {
+            courseEntity.setViewCount(courseEntity.getViewCount() + 1);
+        }
+        courseMapper.updateById(courseEntity);
+
         return Result.success().data("data", courseVO);
     }
 

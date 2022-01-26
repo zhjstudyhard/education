@@ -54,4 +54,6 @@ public interface VideoService extends IService<VideoEntity> {
     Result getVideoById(VideoEntity videoEntity);
 
     void deleteAliyunvod(VideoEntity videoEntity);
+
+    Result getVideoPlayAuth(VideoEntity videoEntity);
 }

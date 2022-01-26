@@ -7,6 +7,7 @@
         c.id,
         c.title,
         c.lesson_num,
+        c.view_count,
         c.cover,
         c.subject_id,
         c.subject_parent_id,

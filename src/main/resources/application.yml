@@ -54,8 +54,8 @@ aliyun:
   oss:
     file:
       endpoint: "https://oss-cn-hangzhou.aliyuncs.com"
-      accessKeyId: "LTAI5tAUqSobwA3iSJahrvEK"
-      accessKeySecret: "zul8WPqOuZHXA2U3DMx5zlBs8CtvQ6"
+      accessKeyId: "LTAI5tNu9qf7vcCFszBFMJbW"
+      accessKeySecret: "rUTAwjaMxo0pWiV9HouQulRr9iIGnV"
       bucketname: "edu-firstly"
 
 
