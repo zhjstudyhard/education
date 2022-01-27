@@ -63,6 +63,16 @@ public class CommentVo {
      * 评论父id
      */
     private String parentId;
+
+    /**
+     * 课程id
+     */
+    private String courseId;
+
+    /**
+     * 是否作者自己发布的评论（0：否，1：是）
+     */
+    private Integer courseUser;
     /**
      * 子评论
      */
@@ -162,5 +172,21 @@ public class CommentVo {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public Integer getCourseUser() {
+        return courseUser;
+    }
+
+    public void setCourseUser(Integer courseUser) {
+        this.courseUser = courseUser;
     }
 }

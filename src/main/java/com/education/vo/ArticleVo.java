@@ -57,6 +57,10 @@ public class ArticleVo {
      */
     private String userName;
     /**
+     * 文章作者头像
+     */
+    private String avatar;
+    /**
      * 文章状态(0:未启用，1：启用)
      */
     private Integer status;
@@ -193,5 +197,13 @@ public class ArticleVo {
 
     public void setCommentQuality(Integer commentQuality) {
         this.commentQuality = commentQuality;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

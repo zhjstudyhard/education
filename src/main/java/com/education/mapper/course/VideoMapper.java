@@ -2,10 +2,13 @@ package com.education.mapper.course;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.education.entity.course.VideoEntity;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -20,4 +23,6 @@ import java.util.List;
 public interface VideoMapper extends BaseMapper<VideoEntity> {
 
     void deleteVideoBatchIds(List<String> videoIds);
+
+    List<VideoEntity> selectBatchCourseIds(List<String> courseIds);
 }

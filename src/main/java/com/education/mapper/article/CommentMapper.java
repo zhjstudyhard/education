@@ -24,4 +24,8 @@ public interface CommentMapper extends BaseMapper<CommentEntity> {
     CommentVo queryApplyUserComment(CommentVo commentVoLocal);
 
     List<CommentVo> queryAllComment(CommentDto commentDto);
+
+    List<CommentVo> queryCourseComment(CommentDto commentDto);
+
+    List<CommentVo> queryCourseApplyComment(CommentVo commentVo);
 }

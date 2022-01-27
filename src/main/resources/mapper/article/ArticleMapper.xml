@@ -52,6 +52,7 @@
         select
         ba.*,
         bu.username as userName,
+        bu.avatar,
         bd.dictionary_value as typeName
         from b_article ba
         left join b_user bu on bu.id = ba.user_id and bu.is_deleted = 0

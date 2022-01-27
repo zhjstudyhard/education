@@ -29,5 +29,5 @@ public interface CourseMapper extends BaseMapper<CourseEntity> {
 
     List<CourseVO> pageListCourse(CourseDto courseDto);
 
-    List<CourseEntity> selectCourses();
+    List<CourseVO> selectCourses();
 }

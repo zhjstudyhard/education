@@ -22,6 +22,10 @@ public class CommentEntity extends BaseEntity {
     private String articleId;
 
     /**
+     * 课程id
+     */
+    private String courseId;
+    /**
      * 评论父id
      */
     private String parentId;
@@ -40,6 +44,11 @@ public class CommentEntity extends BaseEntity {
      * 是否博主自己发布的评论（0：否，1：是）
      */
     private Integer articleUser;
+
+    /**
+     * 是否作者自己发布的评论（0：否，1：是）
+     */
+    private Integer courseUser;
 
 
     public String getContent() {
@@ -88,5 +97,21 @@ public class CommentEntity extends BaseEntity {
 
     public void setFirstParentId(String firstParentId) {
         this.firstParentId = firstParentId;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public Integer getCourseUser() {
+        return courseUser;
+    }
+
+    public void setCourseUser(Integer courseUser) {
+        this.courseUser = courseUser;
     }
 }

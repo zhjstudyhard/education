@@ -9,4 +9,13 @@
              #{videoId}
         </foreach>
     </update>
+    <select id="selectBatchCourseIds" resultType="com.education.entity.course.VideoEntity">
+        select
+        *
+        from b_video where is_deleted = 0
+        and course_id in
+        <foreach collection="courseIds" item="courseId" open="(" separator="," close=")">
+            #{courseId}
+        </foreach>
+    </select>
 </mapper>

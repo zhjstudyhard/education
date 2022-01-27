@@ -63,6 +63,14 @@ public class CourseVO {
      */
     private Long viewCount;
     /**
+     * 学习总数量
+     */
+    private Long playTotalCount;
+    /**
+     * 评论总数量
+     */
+    private Long commentTotalCount;
+    /**
      * 课程状态 Draft未发布  Normal已发布
      */
     private String status;
@@ -228,5 +236,19 @@ public class CourseVO {
         this.id = id;
     }
 
+    public Long getPlayTotalCount() {
+        return playTotalCount;
+    }
 
+    public void setPlayTotalCount(Long playTotalCount) {
+        this.playTotalCount = playTotalCount;
+    }
+
+    public Long getCommentTotalCount() {
+        return commentTotalCount;
+    }
+
+    public void setCommentTotalCount(Long commentTotalCount) {
+        this.commentTotalCount = commentTotalCount;
+    }
 }

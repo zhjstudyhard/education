@@ -10,12 +10,14 @@ import com.education.dto.base.ResponsePageDto;
 import com.education.entity.article.ArticleEntity;
 import com.education.entity.article.CommentEntity;
 import com.education.entity.article.MessageEntity;
+import com.education.entity.course.CourseEntity;
 import com.education.entity.system.DictionaryEntity;
 import com.education.entity.system.UserEntity;
 import com.education.exceptionhandler.EducationException;
 import com.education.mapper.article.ArticleMapper;
 import com.education.mapper.article.CommentMapper;
 import com.education.mapper.article.MessageMapper;
+import com.education.mapper.course.CourseMapper;
 import com.education.service.article.CommentService;
 import com.education.util.EntityUtil;
 import com.education.util.ShiroEntityUtil;
@@ -51,6 +53,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private MessageMapper messageMapper;
+
+    @Autowired
+    private CourseMapper courseMapper;
 
     @Override
     public void addComment(CommentDto commentDto) throws Exception{
@@ -113,6 +118,64 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public void addVideoComment(CommentDto commentDto) throws Exception{
+        Subject subject = SecurityUtils.getSubject();
+        UserEntity userEntity = (UserEntity) subject.getPrincipal();
+        //属性赋值
+        CommentEntity commentEntity = new CommentEntity();
+        BeanUtils.copyProperties(commentDto, commentEntity, new String[]{"id"});
+        commentEntity.setUserId(userEntity.getId());
+        EntityUtil.addCreateInfo(commentEntity);
+        //判断是否作者自己评论
+        CourseEntity courseEntity = courseMapper.selectById(commentDto.getCourseId());
+        if (courseEntity == null) {
+            throw new EducationException(ResultCode.FAILER_CODE.getCode(), "课程数据不存在");
+        }
+
+        if (courseEntity.getTeacherId().equals(userEntity.getId())) {
+            commentEntity.setCourseUser(1);
+        } else {
+            commentEntity.setCourseUser(0);
+        }
+        //添加
+        commentMapper.insert(commentEntity);
+
+        //添加消息通知
+        addVideoMessage(commentEntity, courseEntity,commentDto.getTargetType());
+    }
+    public void addVideoMessage(CommentEntity commentEntity, CourseEntity courseEntity,Integer targetType) throws Exception {
+        //初始化属性值
+        MessageEntity messageEntity = new MessageEntity();
+        EntityUtil.addCreateInfo(messageEntity);
+        messageEntity.setTargetId(courseEntity.getId());
+        messageEntity.setTargetType(targetType);
+        messageEntity.setFromUserId(commentEntity.getUserId());
+        messageEntity.setContent(commentEntity.getContent());
+        messageEntity.setParentCommentId(commentEntity.getParentId());
+        //判断消息类型
+        if (StringUtils.isNotBlank(commentEntity.getParentId()) && commentEntity.getParentId().equals(Constant.NUMBER_NEGATIVE_ONE)){
+
+            messageEntity.setToUserId(courseEntity.getTeacherId());
+            DictionaryEntity dictionaryEntity = GlobalData.dictMap.get(Constant.MESSAGE_COMMENT);
+            if (dictionaryEntity != null){
+                messageEntity.setType(dictionaryEntity.getDictionaryCode());
+            }
+        }else {
+            DictionaryEntity dictionaryEntity = GlobalData.dictMap.get(Constant.MESSAGE_MESSAGE_ANSWER);
+            if (dictionaryEntity != null){
+                messageEntity.setType(dictionaryEntity.getDictionaryCode());
+            }
+            CommentEntity parentCommentEntity = commentMapper.selectById(commentEntity.getParentId());
+            if (parentCommentEntity == null){
+                throw new EducationException(ResultCode.FAILER_CODE.getCode(),"父评论不存在");
+            }
+            messageEntity.setToUserId(parentCommentEntity.getUserId());
+        }
+        messageMapper.insert(messageEntity);
+        //执行完成后，通知接收消息人
+        WebSocketUtil.sendInfoByUserId(messageMapper.queryMessageCount(messageEntity.getToUserId()).toString(), messageEntity.getToUserId());
+    }
+    @Override
     public void delComment(CommentDto commentDto) {
         if (StringUtils.isBlank(commentDto.getId())) {
             throw new EducationException(ResultCode.FAILER_CODE.getCode(), "主键不能为空");
@@ -148,6 +211,25 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public Result queryCourseComment(CommentDto commentDto) {
+        PageHelper.startPage(commentDto.getCurrentPage(), commentDto.getPageSize());
+        List<CommentVo> commentVos = commentMapper.queryCourseComment(commentDto);
+        PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentVos);
+        for (CommentVo commentVo : commentVos) {
+            //查询子评论
+            List<CommentVo> applyCommentVos = commentMapper.queryCourseApplyComment(commentVo);
+            //设置子评论回复的父属性
+            for (CommentVo commentVoLocal : applyCommentVos) {
+                CommentVo applyUserComment = commentMapper.queryApplyUserComment(commentVoLocal);
+                commentVoLocal.setApplyParentName(applyUserComment.getApplyParentName());
+            }
+            commentVo.setReplyComments(applyCommentVos);
+        }
+//        return Result.success();
+        return Result.success().data("data", new ResponsePageDto<>(commentVos, commentVoPageInfo.getTotal(), commentVoPageInfo.getPageSize(), commentVoPageInfo.getPageNum()));
+    }
+
+    @Override
     public Result queryAllComment(CommentDto commentDto) {
         UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
         if (commentDto.getIsAdmin() != null) {
@@ -160,10 +242,6 @@ public class CommentServiceImpl implements CommentService {
                 }
             }
         }
-//        Boolean flag = ShiroEntityUtil.checkPermission();
-//        if (flag) {
-//            commentDto.setUserId(userEntity.getId());
-//        }
         PageHelper.startPage(commentDto.getCurrentPage(), commentDto.getPageSize());
         PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentMapper.queryAllComment(commentDto));
         return Result.success().data("data", new ResponsePageDto<>(commentVoPageInfo.getList(), commentVoPageInfo.getTotal(), commentVoPageInfo.getPageSize(), commentVoPageInfo.getPageNum()));

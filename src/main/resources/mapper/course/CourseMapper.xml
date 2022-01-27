@@ -61,9 +61,23 @@
             and subject_id = #{subjectId}
         </if>
     </select>
-    <select id="selectCourses" resultType="com.education.entity.course.CourseEntity">
-        select * from b_course where is_deleted = 0
-        order by view_count
-        limit 8
+    <select id="selectCourses" resultType="com.education.vo.CourseVO">
+        SELECT
+        b.*, (
+        SELECT
+        count(*)
+        FROM
+        b_comment bc
+        WHERE
+        bc.course_id = b.id
+        AND bc.is_deleted = 0
+        ) AS commentTotalCount
+        FROM
+        b_course b
+        WHERE
+        is_deleted = 0
+        ORDER BY
+        view_count DESC
+        LIMIT 8
     </select>
 </mapper>

@@ -42,6 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -291,7 +293,23 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
     @Override
     public Result indexData() {
         //查询前八条课程
-        List<CourseEntity> courses = courseMapper.selectCourses();
+        List<CourseVO> courses = courseMapper.selectCourses();
+        List<String> courseIds = courses.stream().map(o -> o.getId()).collect(Collectors.toList());
+        //查询当前课程视频
+        List<VideoEntity> videoList = videoMapper.selectBatchCourseIds(courseIds);
+
+        for (CourseVO courseVO : courses) {
+            Long playTotalCount = new Long(0);
+            for (VideoEntity videoEntity : videoList) {
+                if (videoEntity.getCourseId().equals(courseVO.getId())) {
+                    if (videoEntity.getPlayCount() == null) {
+                        videoEntity.setPlayCount(new Long(0));
+                    }
+                    playTotalCount = playTotalCount + videoEntity.getPlayCount();
+                }
+            }
+            courseVO.setPlayTotalCount(playTotalCount);
+        }
         //查询讲师
         List<TeacherEntity> teachers = teacherMapper.selectTeachers();
         HashMap<String, Object> map = new HashMap<>();

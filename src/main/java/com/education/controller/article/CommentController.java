@@ -33,6 +33,12 @@ public class CommentController {
         return Result.success();
     }
 
+    @PostMapping("addVideoComment")
+    public Result addVideoComment(@Validated @RequestBody CommentDto commentDto) throws Exception{
+        commentService.addVideoComment(commentDto);
+        return Result.success();
+    }
+
     /**
      * @param commentDto
      * @return com.education.common.Result
@@ -57,6 +63,17 @@ public class CommentController {
     @PostMapping("queryComment")
     public Result queryComment(@RequestBody CommentDto commentDto) {
         return commentService.queryComment(commentDto);
+    }
+    /**
+     * @param commentDto
+     * @return com.education.common.Result
+     * @description 分页查询视频评论
+     * @author 橘白
+     * @date 2021/12/27 20:35
+     */
+    @PostMapping("queryCourseComment")
+    public Result queryCourseComment(@RequestBody CommentDto commentDto) {
+        return commentService.queryCourseComment(commentDto);
     }
 
     /**

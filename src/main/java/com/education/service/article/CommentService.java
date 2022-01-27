@@ -16,4 +16,8 @@ public interface CommentService {
     Result queryComment(CommentDto commentDto);
 
     Result queryAllComment(CommentDto commentDto);
+
+    void addVideoComment(CommentDto commentDto) throws Exception;
+
+    Result queryCourseComment(CommentDto commentDto);
 }

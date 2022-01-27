@@ -26,6 +26,11 @@ public class CommentDto {
     private String articleId;
 
     /**
+     * 课程id
+     */
+    private String courseId;
+
+    /**
      * 评论父id
      */
     private String parentId;
@@ -128,5 +133,13 @@ public class CommentDto {
 
     public void setIsAdmin(Integer isAdmin) {
         this.isAdmin = isAdmin;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
     }
 }
