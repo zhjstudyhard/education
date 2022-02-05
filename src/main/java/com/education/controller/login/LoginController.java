@@ -1,5 +1,7 @@
 package com.education.controller.login;
 
+import com.education.aop.LogRetention;
+import com.education.common.LogTypeNum;
 import com.education.common.Result;
 import com.education.dto.system.UserDto;
 import com.education.entity.system.PermissionEntity;
@@ -33,6 +35,7 @@ public class LoginController {
      */
 
     @PostMapping("/login")
+    @LogRetention(model = "用户登录",logType = LogTypeNum.LOGIN)
     public Result userLogin(@RequestBody UserDto userDto, HttpServletResponse response) throws Exception {
         return userLoginService.login(userDto, response);
     }
@@ -45,6 +48,7 @@ public class LoginController {
      */
 
     @PostMapping("/logout")
+    @LogRetention(model = "用户登出",logType = LogTypeNum.LOGOUT)
     public Result userLogOut() {
         userLoginService.loginOut();
         return Result.success();

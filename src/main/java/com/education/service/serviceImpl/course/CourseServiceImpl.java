@@ -10,6 +10,7 @@ import com.education.common.ResultCode;
 import com.education.config.GlobalData;
 import com.education.config.OssConfig;
 import com.education.constant.Constant;
+import com.education.dto.article.CommentDto;
 import com.education.dto.base.ResponsePageDto;
 import com.education.dto.course.ChapterDto;
 import com.education.dto.course.CourseDto;
@@ -17,8 +18,10 @@ import com.education.entity.course.ChapterEntity;
 import com.education.entity.course.CourseDescriptionEntity;
 import com.education.entity.course.CourseEntity;
 import com.education.entity.course.VideoEntity;
+import com.education.entity.system.UserEntity;
 import com.education.entity.teacher.TeacherEntity;
 import com.education.exceptionhandler.EducationException;
+import com.education.mapper.article.CommentMapper;
 import com.education.mapper.course.ChapterMapper;
 import com.education.mapper.course.CourseDescriptionMapper;
 import com.education.mapper.course.CourseMapper;
@@ -28,7 +31,10 @@ import com.education.service.course.ChapterService;
 import com.education.service.course.CourseService;
 import com.education.service.course.VideoService;
 import com.education.util.EntityUtil;
+import com.education.util.ShiroEntityUtil;
+import com.education.vo.ArticleVo;
 import com.education.vo.ChapterVo;
+import com.education.vo.CommentVo;
 import com.education.vo.CourseVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -78,6 +84,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
 
     @Autowired
     private ChapterService chapterService;
+
+    @Autowired
+    private CommentMapper commentMapper;
 
 
     @Override
@@ -316,5 +325,43 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, CourseEntity> i
         map.put("eduList", courses);
         map.put("teacherList", teachers);
         return Result.success().data(map);
+    }
+
+    @Override
+    public Result queryCourseAllComment(CommentDto commentDto) {
+        UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
+        if (commentDto.getIsAdmin() != null) {
+            if (commentDto.getIsAdmin().equals(0)) {
+                commentDto.setUserId(userEntity.getId());
+            } else {
+                Boolean flag = ShiroEntityUtil.checkPermission();
+                if (flag) {
+                    commentDto.setUserId(userEntity.getId());
+                }
+            }
+        }
+        PageHelper.startPage(commentDto.getCurrentPage(), commentDto.getPageSize());
+        PageInfo<CommentVo> commentVoPageInfo = new PageInfo<>(commentMapper.queryCourseAllComment(commentDto));
+        return Result.success().data("data", new ResponsePageDto<>(commentVoPageInfo.getList(), commentVoPageInfo.getTotal(), commentVoPageInfo.getPageSize(), commentVoPageInfo.getPageNum()));
+    }
+
+    @Override
+    public Result getAllCourse(CourseDto courseDto) {
+        UserEntity userEntity = ShiroEntityUtil.getShiroEntity();
+
+        if (courseDto.getIsAdmin() != null) {
+            if (courseDto.getIsAdmin().equals(0)) {
+                courseDto.setUserId(userEntity.getId());
+            } else {
+                Boolean flag = ShiroEntityUtil.checkPermission();
+                if (flag) {
+                    courseDto.setUserId(userEntity.getId());
+                }
+            }
+        }
+
+        PageInfo<CourseVO> pageInfo = new PageInfo<>(courseMapper.pageListCourse(courseDto));
+        ResponsePageDto<CourseVO> articleVoResponsePageDto = new ResponsePageDto<>(pageInfo.getList(), pageInfo.getTotal(), pageInfo.getPageSize(), pageInfo.getPageNum());
+        return Result.success().data("data", articleVoResponsePageDto);
     }
 }

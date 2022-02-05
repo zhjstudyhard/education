@@ -3,6 +3,7 @@ package com.education.service.course;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.education.common.Result;
+import com.education.dto.article.CommentDto;
 import com.education.dto.course.CourseDto;
 import com.education.entity.course.CourseEntity;
 
@@ -39,4 +40,8 @@ public interface CourseService extends IService<CourseEntity> {
 
 
     Result indexData();
+
+    Result queryCourseAllComment(CommentDto commentDto);
+
+    Result getAllCourse(CourseDto courseDto);
 }

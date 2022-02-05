@@ -40,7 +40,7 @@
         ba.title as title
         from b_comment bc
         left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
-        left join b_article ba on ba.id = bc.article_id and ba.is_deleted = 0
+        inner join b_article ba on ba.id = bc.article_id and ba.is_deleted = 0
         where bc.is_deleted = 0
         <if test="userId != null and userId != ''">
             and bc.user_id = #{userId}
@@ -69,6 +69,24 @@
         left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
         where bc.is_deleted = 0 and bc.course_id = #{courseId}
         and (bc.parent_id = #{id} or bc.first_parent_id = #{id})
+        order by bc.gmt_create DESC
+    </select>
+    <select id="queryCourseAllComment" resultType="com.education.vo.CommentVo">
+        select
+        bc.*,
+        bu.username,
+        bu.avatar,
+        ba.title as title
+        from b_comment bc
+        left join b_user bu on bu.id = bc.user_id and bu.is_deleted = 0
+        inner join b_course ba on ba.id = bc.course_id and ba.is_deleted = 0
+        where bc.is_deleted = 0
+        <if test="userId != null and userId != ''">
+            and bc.user_id = #{userId}
+        </if>
+        <if test="courseId != null and courseId != ''">
+            and bc.course_id = #{courseId}
+        </if>
         order by bc.gmt_create DESC
     </select>
 </mapper>

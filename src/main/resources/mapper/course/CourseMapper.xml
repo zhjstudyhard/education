@@ -80,4 +80,7 @@
         view_count DESC
         LIMIT 8
     </select>
+    <select id="getAllCourse" resultType="com.education.vo.CourseVO">
+
+    </select>
 </mapper>

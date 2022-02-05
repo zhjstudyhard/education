@@ -30,4 +30,6 @@ public interface CourseMapper extends BaseMapper<CourseEntity> {
     List<CourseVO> pageListCourse(CourseDto courseDto);
 
     List<CourseVO> selectCourses();
+
+    List<CourseVO> getAllCourse(CourseDto courseDto);
 }

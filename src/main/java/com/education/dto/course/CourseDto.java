@@ -60,6 +60,17 @@ public class CourseDto {
      */
     private String status;
 
+    /**
+     * 作者id
+     */
+
+    private String userId;
+
+    /**
+     * 是否后台请求（0:否，1是）
+     */
+    private Integer isAdmin;
+
 
     public String getId() {
         return id;
@@ -147,5 +158,21 @@ public class CourseDto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

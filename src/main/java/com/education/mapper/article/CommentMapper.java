@@ -28,4 +28,6 @@ public interface CommentMapper extends BaseMapper<CommentEntity> {
     List<CommentVo> queryCourseComment(CommentDto commentDto);
 
     List<CommentVo> queryCourseApplyComment(CommentVo commentVo);
+
+    List<CommentVo> queryCourseAllComment(CommentDto commentDto);
 }
