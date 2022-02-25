@@ -147,6 +147,8 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(userDto, userEntity);
         userEntity.setIsExpired(0);
         userEntity.setLocked(0);
+        //设置密码
+        userEntity.setPassword(MD5Util.encrypt("123"));
         userMapper.insert(userEntity);
 
         //添加角色
